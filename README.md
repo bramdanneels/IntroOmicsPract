@@ -1,4 +1,4 @@
-#Introduction to -omics
+# Introduction to -omics
 
 This repository contains all necessary material for the practical exercises of the "Introduction to -omics" course (UiB - BINF201).
 
@@ -12,20 +12,21 @@ The practicals are tested and developped on a linux system. They are not guarant
 
 ## Content
 
--[Practical 0: Introduction & setup](practicals/00_IntroSetup.md)
--[Practical 1: Genome Browsers](practicals/01_GenomeBrowsers.md)
--[Practical 2: Quality Control](practicals/02_QC.md)
--[Practical 3: Genome Assembly](practicals/03_GenomeAssembly.md)
--[Practical 4: Transcriptome Assembly](practicals/04_TranscriptomeAssembly.md)
--[Practical 5: Read Mapping](practicals/05_ReadMapping.md)
--[Practical 6: Metagenomics](practicals/06_Metagenomics.md)
--[Practical 7: Introduction to R](practicals/07_RIntro.md)
--[Practical 8: Differential Gene Expression](practicals/08_DGE.md)
--[Practical 9: Enrichment Analysis](practicals/09_Enrichment.md)
-
+- [Practical 0: Introduction & setup](Practicals/00_IntroSetup.md)
+- [Practical 1: Genome Browsers](Practicals/01_GenomeBrowsers.md)
+- [Practical 2: Quality Control](Practicals/02_QC.md)
+- [Practical 3: Genome Assembly](Practicals/03_GenomeAssembly.md)
+- [Practical 4: Transcriptome Assembly](Practicals/04_TranscriptomeAssembly.md)
+- [Practical 5: Read Mapping](Practicals/05_ReadMapping.md)
+- [Practical 6: Metagenomics](Practicals/06_Metagenomics.md)
+- [Practical 7: Introduction to R](Practicals/07_RIntro.md)
+- [Practical 8: Differential Gene Expression](Practicals/08_DGE.md)
+- [Practical 9: Enrichment Analysis](Practicals/09_Enrichment.md)
 
 ## Acknowledgements & Contact
 
-This github page has been developped and published by Bram Danneels. In case of comments or questions, please contact bram.danneels(at)uib.no
+This github page has been developped and published by Bram Danneels. In case of comments or questions, please contact *bram.danneels(at)uib.no*
+
 Practical exercises are based on practicals orginally developped by Håkon Tjeldnes.
+
 R-based practicals have been tested & verified by Gutama Ibrahim.
