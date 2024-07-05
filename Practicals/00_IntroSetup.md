@@ -30,6 +30,27 @@ conda config --add channels conda-forge
 conda config --set channel_priority strict
 ```
 
+## Data download
+
+All data used in these practicals is publically available. The data is provided on the NREC server for the students of the course. 
+
+For people who do not have access to NREC and/or want to do the practicals on their own computer, all data used in this practicals is available through [Zenodo]().
+Download links to the specific files needed for a tutorial are available in each tutorial.
+
+Alternatively, you can download and pre-process the data yourself. To do this, it is advised to create an environment dedicated to downloading and processing the necessary data.
+You can create this enviroment by running the following command (after having installed `mamba`, see above):
+
+```
+mamba create -n downloader sra-tools ncbi-datasets-cli seqtk pigz
+```
+
+- [SRA tools](https://github.com/ncbi/sra-tools) is used for downloading data from [SRA](https://www.ncbi.nlm.nih.gov/sra) (mainly raw sequencing data in `.fastq` format.
+- [NCBI datasets](https://www.ncbi.nlm.nih.gov/datasets/docs/v2/download-and-install/) is used for downloading assembled sequences (genomes, genes, proteins) from NCBI.
+- [SeqTK](https://github.com/lh3/seqtk) is a sequence toolkit, which we will mainly use to subset larger datasets into smaller ones
+- [Pigz](https://github.com/madler/pigz) is a parallel implementation of GZip, allowing fast (de)compression of files
+
+The commands needed to download the necessary data are included in each practical as well.
+
 ## R and Rstudio
 For practicals 7-9 we will be using R and R studio. These have to be downloaded and installed yourself. Please follow the instructions [here](https://posit.co/download/rstudio-desktop/) on how to install both R and Rstudio.
 For these practicals, it is not necessary to be on Linux or the NREC server.

@@ -14,6 +14,7 @@ Find the BRCA1 gene using the search bar.
 
 <details>
 <summary>The gene models (in blue) have 3 types of lines: thick lines, medium lines, and fine lines (sometimes with arrows). What do these 3 different lines represent?</summary>
+
 - _Thin lines: introns_
 - _Thick lines: translated exons_
 - _Medium lines: un-translated exons (e.g. UTRs)_
@@ -24,7 +25,7 @@ Open the info panel for the BRCA1 gene by clicking on one of the transcripts. An
 <details>
 <summary>What is the function of the BRCA1 gene in humans?</summary>
 
-_Maintaining genome stabolity and tumor suppression._
+_Maintaining genome stability and tumor suppression._
 </details>
 
 <details>
@@ -94,7 +95,7 @@ Click one the first non-human gene to open the detailed view.
 <details>
 <summary>From what organisms is the gene?</summary>
 
-_Mouse (Mus musculus) _
+_Mouse (Mus musculus)_
 </details>
 
 <details>
@@ -177,7 +178,7 @@ In the "Regulation" category, activate the ORegAnno track. [ORegAnno](https://ww
 
 <details>
 <summary>Are there any proteins that bind to our supsected regulatory region? If so, which ones?</summary>
-_Yes:
+_Yes:_
 
 - _EGR1 (transcription factor)_
 - _CTCF (transcription factor)_
