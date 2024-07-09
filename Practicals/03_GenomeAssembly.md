@@ -105,8 +105,8 @@ _No: The quality scores are all above Q30, and there are no adapters detected in
 
 _200x coverage_
 
-_To caculate this, we need to first calculate the total number of bases in our read set. We have two read sets with 387568 reads of 150bp. Thus, the total number of bases is $2*387568*150$ = 116 270 400bp._
-_Since we the genome is 580kbp (580 000bp) long, that means we should have an average coverage of $116270400/580000$ or 200x coverage._
+_To caculate this, we need to first calculate the total number of bases in our read set. We have two read sets with 387568 reads of 150bp. Thus, the total number of bases is_ $2*387568*150$ _= 116 270 400bp._
+_Since we the genome is 580kbp (580 000bp) long, that means we should have an average coverage of_ $116270400/580000$ _or 200x coverage._
 </details>
 
 ## Genome assembly using Spades
@@ -263,36 +263,36 @@ _The SPAdes assemblies have the highest N50: 417 388_
 
 _This is the highest value, as a higher N50 is better. This is because a higher N50 means that the largest contigs (making up at least 50% of the assembly) are larger compared to assemblies with lower N50._
 
-_The N50 value can be found in the "Statistics without reference" section.
+_The N50 value can be found in the "Statistics without reference" section._
 </details>
 
 <details>
 <summary>Compare the size of the largest contig with the N50 of the SPAdes assembly. Is there anything that stands out? How would you explain this?</summary>
 
 _Yes: they are the same. This is because the largest contig (417kbp) takes up over half of the assembly (577kbp). Thus, half of the assembly is contained in the largest contig, which is 417kbp._
-_This explains also why the L50 is 1: you only need 1 contig to get at least 50% of the assembly.
+_This explains also why the L50 is 1: you only need 1 contig to get at least 50% of the assembly._
 </details>
 
 <details>
 <summary>In the "Genome statistics" section, there is a metric called NG50. How does this differ from N50? Which metric would you prefer to use to assess the quality of an assembly?</summary>
 
-_NG50 is relative to the reference genome size, while N50 is relative to the assembly size. Using NG50 is preferred, because it avoids bias because of incomplete assemblies (see example below).
+_NG50 is relative to the reference genome size, while N50 is relative to the assembly size. Using NG50 is preferred, because it avoids bias because of incomplete assemblies (see example below)._
 
 _Example: We have two assemblies of a genome:_
 
 - _AssemblyA has 12 contigs of each 250kbp_
 - _AssemblyB has 2 contig of each 500kbp, and 25 contigs of each 1kbp_
 
-We know from previous studies that the genome of this species should be around 2.5 Mbp.
-Using this information we can calculate the N50:
+_We know from previous studies that the genome of this species should be around 2.5 Mbp._
+_Using this information we can calculate the N50:_
 
 _The N50 of AssemblyA is 250kbp (half of the assembly is in contigs of size 250kbp or larger), the N50 of AssemblyB is 500kbp (half of the assembly is in contigs of size 500kbp or larger)_
 
-_Based on N50 alone it looks like Assembly is better (higher value). However, let's calculate NG50 now. This means we have to see the size of the contigs that we need to have 50% of the reference genome (= 1.25 Mbp)_200x
+_Based on N50 alone it looks like Assembly is better (higher value). However, let's calculate NG50 now. This means we have to see the size of the contigs that we need to have 50% of the reference genome (= 1.25 Mbp)_
 
 _The NG50 of AssemblyA is still 250kbp (we can build an assembly of 1.25 Mbp using contigs of 250kbp or higher). However, the NG50 of AssemblyB is now 1kbp: We need all contigs to get to an assembly of 1.25 Mbp, thus the NG50 is equal to the smalles contig (1 kbp)_
 
-_Thus, NG50 is a better metric to assess an assembly, but it requires you to have a reference genome, or to know how large the genome should be.
+_Thus, NG50 is a better metric to assess an assembly, but it requires you to have a reference genome, or to know how large the genome should be._
 </details>
 
 
@@ -359,7 +359,7 @@ If all goes well, it should have identified the genome as bacterial (the generic
 <summary>Compare the results for the bacteria dataset with the results for the mycoplasmatales. Why could there be such a big difference?</summary>
 
 _BUSCO only finds 55% of conserved bacterial genes, but 97% of mycoplasmatales genes. This is because Mycoplasmoides is very different from normal bacteria. It has a small genome (580 kbp) compared to most bacteria (who are mostl around 3-5 Mbp), and is pathogenic._
-_This means that this bacterium is very specialized, and doesn't have many of the "general" genes that other bacteria have". However, if we only look at conserved genes within the Mycoplasmatales, it does have most genes that we expect._
+_This means that this bacterium is very specialized, and doesn't have many of the "general" genes that other bacteria have. However, if we only look at conserved genes within the Mycoplasmatales, it does have most genes that we expect._
 _This is because most species in the Mycoplasmatales are specialized in the same way, and thus share a lot more genes._
 
 _As a general rule, a BUSCO score >90% is considered good, >95% is considered very good._
