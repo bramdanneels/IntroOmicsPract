@@ -90,16 +90,19 @@ Then, run FastQC on both files, and look at the reports.
 
 <details>
 <summary>How many reads are in this dataset, and how long are the reads?</summary>
+
 _There are 387 568 reads in the dataset, all of them 150bp long._
 </details>
 
 <details>
 <summary>Based on the report, is adapter and/or quality trimming necessary?</summary>
+
 _No: The quality scores are all above Q30, and there are no adapters detected in both read files_
 </details>
 
 <details>
 <summary>Given that the genome size of _M. genitalium_ is +- 580 kbp, what coverage do we expect to have with our read set?</summary>
+
 _200x coverage_
 
 _To caculate this, we need to first calculate the total number of bases in our read set. We have two read sets with 387568 reads of 150bp. Thus, the total number of bases is $2*387568*150$ = 116 270 400bp._
@@ -123,7 +126,9 @@ The assembly can take some minutes to complete. In the meantime, you can try ans
 
 <details>
 <summary>What do the "isolate" and "careful" options do?</summary>
-According to the SPAdes manual:
+
+_According to the SPAdes manual:_
+
 - _The `--isolate` option: This flag is highly recommended for high-coverage isolate and multi-cell Illumina data; improves the assembly quality and running time. We also recommend trimming your reads prior to the assembly._
 - _The `careful` option : Tries to reduce the number of mismatches and short indels. Also runs MismatchCorrector - a post processing tool, which uses BWA tool (comes with SPAdes). This option is recommended only for assembly of small genomes. We strongly recommend not to use it for large and medium-size eukaryotic genomes._
 </details>
@@ -137,6 +142,7 @@ According to the SPAdes manual:
 
 <details>
 <summary>What is mate pair sequencing, and how is it similar and/or different from classic paired end sequencing?</summary>
+
 _Mate Pair sequencing is a type of paired end sequnecing where the size of the DNA fragments is significantly larger. Mate pair sequencing is often used in combination with normal paired end sequencing to improve difficult genome assemblies, and to generate longer scaffolds from the contigs._
 </details>
 
@@ -151,6 +157,7 @@ grep -c ">" spades_*/contigs.fasta spades_*/scaffolds.fasta
 
 <details>
 <summary>Are there any differences in the number of contigs or scaffolds between both runs?</summary>
+
 _Yes: the `careful` run has slightly more contigs and scaffolds (57 vs 54/53). There is no difference between contigs and scaffolds in the `careful` run, but there is one fewer scaffold than contigs in the `isolate` run_
 > Note: the exact numbers you have may vary from the results given here.
 </details>
@@ -177,6 +184,7 @@ Use `grep` again to find the number of contigs and scaffolds in the two Abyss as
 
 <details>
 <summary>Which of the two ABySS assemblies gives the most contigs? Do you think this is better or worse?</summary>
+
 _The assembly using a k-value of 31 gave a lot more contigs: 570 vs 49_
 
 _Assuming the total assembly length is the same, having more contigs is worse than having fewer contigs, as more contigs means the assembly is more fragmented (more, but smaller contigs)_
@@ -184,11 +192,13 @@ _Assuming the total assembly length is the same, having more contigs is worse th
 
 <details>
 <summary>Are there differences between scaffolds and contigs in the assemblies?</summary>
+
 _Yes: In general there are fewer scaffolds than contigs (549 vs 570 in k31; 20 vs 49 in k75)_
 </details>
 
 <details>
 <summary>Why do we observe such a large different in the number of contigs between k31 and k75?</summary>
+
 _Using shorter k-mers (lower k-value) means using shorter sections of our reads to find overlaps. This means it is more difficult to solve repeats using shorter k-mers, leading to higher fragmentation._
 </details>
 
@@ -205,6 +215,7 @@ Megahit does not create scaffolds, and will output the contigs in a file called 
 
 <details>
 <summary>How many contigs are in the megahit assembly?</summary>
+
 _22_
 </details>
 
@@ -234,17 +245,20 @@ This will create a folder called "assembly_QC" containing the report on the stat
 
 <details>
 <summary>Which of the assemblies gave the largest contig? Which one gave the largest scaffold?</summary>
+
 _The SPAdes assemblies: 417 388bp (you can find this in "Largest contig" in the "Statistics without reference" section._
 </details>
 
 <details>
 <summary>Which assembler had the most contigs? Which one the fewest?</summary>
+
 _The ABySS assembly using k31 has the most contigs (549), the ABySS assembly using k75 has the fewest contigs (20)._
 _You can find this under "# contigs (>= 0bp)" in the "Statistics without reference" section._
 </details>
 
 <details>
 <summary>Which assembly has the best N50? Is this the highest or lowest value?</summary>
+
 _The SPAdes assemblies have the highest N50: 417 388_
 
 _This is the highest value, as a higher N50 is better. This is because a higher N50 means that the largest contigs (making up at least 50% of the assembly) are larger compared to assemblies with lower N50._
@@ -254,12 +268,14 @@ _The N50 value can be found in the "Statistics without reference" section.
 
 <details>
 <summary>Compare the size of the largest contig with the N50 of the SPAdes assembly. Is there anything that stands out? How would you explain this?</summary>
+
 _Yes: they are the same. This is because the largest contig (417kbp) takes up over half of the assembly (577kbp). Thus, half of the assembly is contained in the largest contig, which is 417kbp._
 _This explains also why the L50 is 1: you only need 1 contig to get at least 50% of the assembly.
 </details>
 
 <details>
 <summary>In the "Genome statistics" section, there is a metric called NG50. How does this differ from N50? Which metric would you prefer to use to assess the quality of an assembly?</summary>
+
 _NG50 is relative to the reference genome size, while N50 is relative to the assembly size. Using NG50 is preferred, because it avoids bias because of incomplete assemblies (see example below).
 
 _Example: We have two assemblies of a genome:_
@@ -282,22 +298,26 @@ _Thus, NG50 is a better metric to assess an assembly, but it requires you to hav
 
 <details>
 <summary>Which assembly covers the largest fraction of the reference genome?</summary>
+
 _The Abyss_k75 assembly (99.289%). You can find this in the "Genome fraction" row under the "Genome statistics section"._
 </details>
 
 <details>
 <summary>Which assembly shows the most mismatches and indels compared to the reference?</summary>
+
 _The Abyss k75 assembly has the most mismatches and indels, the Abyss k31 the fewest._
 </details>
 
 <details>
 <summary>Given that the read quality was very good, what could be the reason for observing mismatches and indels in our assemblies, compared to the reference?</summary>
+
 _Because we are sequencing a different strain than the reference genome. Bacteria, and especially pathogenic bacteria, evolve very quickly. Thus, if we sequence a bacterium of a certain species, it is very unlikely that we find the exact same genome as the reference._
 _The observed mismatches and indels are thus likely differences that evolved between the reference strain, and the strain that was sequenced in our dataset._
 </details>
 
 <details>
 <summary>Which of the genome assemblies do you think is best, and why?</summary>
+
 _Either one of the SPAdes assemblies, or the ABySS k75. The SPAdes assemblies have a higher NG50 and have a larger largest contig._ 
 _However, ABySS k75 captures a higher fractino of the reference genome, an has fewer contigs in total._
 _Personally, I would pick the SPAdes assembly, but filter the smaller contigs (< 1000bp)_
@@ -337,6 +357,7 @@ If all goes well, it should have identified the genome as bacterial (the generic
 
 <details>
 <summary>Compare the results for the bacteria dataset with the results for the mycoplasmatales. Why could there be such a big difference?</summary>
+
 _BUSCO only finds 55% of conserved bacterial genes, but 97% of mycoplasmatales genes. This is because Mycoplasmoides is very different from normal bacteria. It has a small genome (580 kbp) compared to most bacteria (who are mostl around 3-5 Mbp), and is pathogenic._
 _This means that this bacterium is very specialized, and doesn't have many of the "general" genes that other bacteria have". However, if we only look at conserved genes within the Mycoplasmatales, it does have most genes that we expect._
 _This is because most species in the Mycoplasmatales are specialized in the same way, and thus share a lot more genes._
@@ -348,6 +369,7 @@ Now try running BUSCO yourself on the two ABySS assemblies, but specifying that 
 
 <details>
 <summary>Are there large differences in BUSCO score between the assemblies?</summary>
+
 _There are no large differences, but the BUSCO score is slightly lower in the ABySS-k31 assembly (96.6% vs 97.7%)._
 </details>
 
@@ -400,6 +422,7 @@ Now run Quast on the 4 assemblies and comapre their statistics (we will not comp
 
 <details>
 <summary>Are these assemblies better or worse than the assemblies we have made using short reads? (the expected genomes size is +- 1 Gbp)</summary>
+
 _A lot better. Most assemblers manage to form one big contig close to the expected genome size._
 </details>
 
@@ -407,6 +430,7 @@ Run a BUSCO analysis on one assembly using the Nanopore reads, and one assembly 
 
 <details>
 <summary>Do the BUSCO scores indicate a good assembly?</summary>
+
 _For the HiFi reads: yes (99.4% completeness for mycoplasmatales)_
 
 _For the Nanopore reads: no (23-26% completeness for mollicutes)_
