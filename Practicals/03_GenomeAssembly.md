@@ -25,9 +25,9 @@ You can make a copy of the data you will be working on by running this command f
 
 ```
 mkdir -p Practical3
-ln -s /home/brdan9637/Pract3_Assembly/Data/* Practical3/
+ln -s /storage/Pract3_Assembly/Data/* Practical3/
 ```
-> `mkdir -p` creates a folder called Practical2. The "-p" options tells mkdir to create subdirectories if necessary, and to not give an error if the folder(s) already exist
+> `mkdir -p` creates a folder called Practical3. The "-p" options tells mkdir to create subdirectories if necessary, and to not give an error if the folder(s) already exist
 > `ln -s` creates what we call a "symbolic link". This creates a small file that just says "Instead of this file, use the file that I'm liking to". This allows you to "copy" files without actually having to make a physical copy.
 
 Now, go to the newly created directory (by running `cd Practical3`), and you are ready to start!
@@ -39,10 +39,9 @@ You will first have to setup the correct environment with the necessary tools. S
 To create a new environment including the necessary tools for this practical, run the following command:
 
 ```
-mamba create -n Assembly spades abyss megahit quast busco canu flye hifiasm wget gzip
+mamba create -n Assembly spades abyss megahit quast busco canu flye hifiasm
 ```
 > This will create a new environment called "Assembly" with the necessary tools.
-> Apart from the assembly tools (see below), we'll also installing `wget` to retrieve data, and `gzip` (de)compress data.
 
 Create a new folder (e.g. `Practical3`), go into it (`cd Practical3`), and then download the necessary data, by either:
 
@@ -81,6 +80,7 @@ rm -r SRR24462972*
 
 The data for short-read assembly composed of paired-end Illumina sequencing reads from _Mycoplasmoides genitalium_, a pathogenic bacteria that causes infection of the urinary and genital tracts in humans. 
 The data for long-read assembly is composed of Nanopore and PacBio HiFi reads from _Mycoplasma ovipneumoniae_, a pathogenic bacterium causing pneumonia in sheep and goats.
+The reads used here are only subsets of the total data, to make sure the analyses don't take too long to run.
 For an overview of where the data comes from, see the [information sheet on Zenodo]().
 
 ## Quality Control
@@ -101,12 +101,12 @@ _No: The quality scores are all above Q30, and there are no adapters detected in
 </details>
 
 <details>
-<summary>Given that the genome size of _M. genitalium_ is +- 580 kbp, what coverage do we expect to have with our read set?</summary>
+<summary>Given that the genome size of M. genitalium is +- 580 kbp, what coverage do we expect to have with our read set?</summary>
 
 _200x coverage_
 
-_To caculate this, we need to first calculate the total number of bases in our read set. We have two read sets with 387568 reads of 150bp. Thus, the total number of bases is_ $2*387568*150$ _= 116 270 400bp._
-_Since we the genome is 580kbp (580 000bp) long, that means we should have an average coverage of_ $116270400/580000$ _or 200x coverage._
+_To caculate this, we need to first calculate the total number of bases in our read set. We have two read sets with 387568 reads of 150bp. Thus, the total number of bases is 2\*387568\*150 = 116 270 400bp._
+_Since we the genome is 580kbp (580 000bp) long, that means we should have an average coverage of 116270400/580000 or 200x coverage._
 </details>
 
 ## Genome assembly using Spades

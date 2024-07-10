@@ -1,16 +1,94 @@
 # BINF201 – Practical 4 – Transcriptome Assembly
 
-For this practical, you will need to have installed and configured Conda. If this is not the case, see [here](https://docs.conda.io/en/latest/miniconda.html) for installation instructions for your system.
+In this practical we will perform a transcriptome assembly on a toy dataset containing RNA-seq reads derived from a small region (~100 genes) of the human X chromosome. 
 
-> For Windows users, it is preferable to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install), and install conda on there using the Linux install instructions.
+## Software installation and data retrieval
 
-In this practical we will perform a transcriptome assembly on a toy dataset containing RNA-seq reads derived from a small region (~100 genes) of the human X chromosome. We only use this small dataset to make it feasible in the timeframe of our practicals, and on a standard laptop pc. 
+In this tutorial, we will have a look at the following software:
+
+- [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki) - A _de novo_ RNA-seq transcript assembler
+- [Stringtie2](https://github.com/skovaka/stringtie2) - A reference-based RNA-seq transcript assembler
+- [Hisat2](https://daehwankimlab.github.io/hisat2/) - A fast and sensitive alignment
+- [Megahit](https://github.com/voutcn/megahit) - An ultrafast, memory-efficient De Bruijn Graph assembler for short reads
+- [Canu](https://github.com/marbl/canu): A long-read assembler for both Nanopore and early (noisy) PacBio reads
+- [Flye](https://github.com/mikolmogorov/Flye): Another long-read assembler for all kinds of long reads (high or low error Nanopore & PacBio)
+- [HifiAsm](https://github.com/chhylp123/hifiasm): An assembler specific for PacBio HiFi reads
+- [Quast](https://github.com/ablab/quast) - An assembly QC tool that generates assembly statistics
+- [BUSCO](https://busco.ezlab.org/) - A tool to assess assembly completeness
+
+### For students using NREC
+
+The data and software has been setup on the NREC server. Before starting the practical, make sure to activate the correct environment before each part of the tutorial 
+(`QC` for the QC part, `Assembly` for the assembly part)
+
+You can make a copy of the data you will be working on by running this command from your home directory:
+> If your not sure if you are in the home folder, run `cd` or `cd ~` to go to your home directory.
+
+```
+mkdir -p Practical3
+ln -s /home/brdan9637/Pract3_Assembly/Data/* Practical3/
+```
+> `mkdir -p` creates a folder called Practical2. The "-p" options tells mkdir to create subdirectories if necessary, and to not give an error if the folder(s) already exist
+> `ln -s` creates what we call a "symbolic link". This creates a small file that just says "Instead of this file, use the file that I'm liking to". This allows you to "copy" files without actually having to make a physical copy.
+
+Now, go to the newly created directory (by running `cd Practical3`), and you are ready to start!
+
+### For students running on their own pc
+
+You will first have to setup the correct environment with the necessary tools. See [the intro practical](00_IntroSetup.md) on how to install mamba, and how to create an enviroment for downloading the necessary data.
+
+To create a new environment including the necessary tools for this practical, run the following command:
+
+```
+mamba create -n Assembly spades abyss megahit quast busco canu flye hifiasm wget gzip
+```
+> This will create a new environment called "Assembly" with the necessary tools.
+> Apart from the assembly tools (see below), we'll also installing `wget` to retrieve data, and `gzip` (de)compress data.
+
+Create a new folder (e.g. `Practical3`), go into it (`cd Practical3`), and then download the necessary data, by either:
+
+- Download directly from the [Zenodo repository]():
+
+```
+wget link_to_zenodo_file(s)
+gunzip *gz
+```
+
+- Download manually using the commands below:
+
+> Remember to activate the download environment (see [here](00_IntroSetup.md))
+> Note: Total download size after decompression is +- 1,25 Gb
+
+```
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR486/ERR486840/ERR486840_1.fastq.gz
+mv ERR486840_1.fastq.gz MycGen_1.fastq.gz
+
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR486/ERR486840/ERR486840_2.fastq.gz
+mv ERR486840_2.fastq.gz MycGen_2.fastq.gz
+gunzip *gz
+
+prefetch SRR28208385
+fasterq-dump -p --outdir ./ --split-files SRR28208385/SRR28208385.sra
+mv SRR28208385.fastq MycOvi_Nano.fastq
+rm -r SRR28208385/
+
+prefetch SRR24462972
+fasterq-dump -p --outdir ./ --split-files SRR24462972/SRR24462972.sra
+seqtk sample -s666 SRR24462972.fastq 50000 > MycOvi_HiFi.fastq
+rm -r SRR24462972*
+```
+
+## The Data
+
+The data for short-read assembly composed of paired-end Illumina sequencing reads from _Mycoplasmoides genitalium_, a pathogenic bacteria that causes infection of the urinary and genital tracts in humans. 
+The data for long-read assembly is composed of Nanopore and PacBio HiFi reads from _Mycoplasma ovipneumoniae_, a pathogenic bacterium causing pneumonia in sheep and goats.
+For an overview of where the data comes from, see the [information sheet on Zenodo]().
 
 ## Tool installation & data retrieval
 
 We start by creating a new conda environment for the transcriptome assembly. You can install the necessary tools using the following command:
 
-	conda create -n transcriptome -c conda-forge -c bioconda trinity samtools minimap2 gffcompare hisat2 stringtie wget boost=1.60.0
+	conda create -n transcriptome -c conda-forge -c bioconda trinity samtools minimap2 gffcompare hisat2 stringtie boost=1.60.0
 > In case this installation seems to get stuck on solving the environment, try using Mamba instead of Conda (see the end of this document)
 
 Then we will download the necessary data. Create a new folder for this practical (e.g. Transcriptome), and go into it.
