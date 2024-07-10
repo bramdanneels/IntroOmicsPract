@@ -1,7 +1,7 @@
 
 # BINF201 – Practical 4 – Read Mapping
 
-In this practical we will map different kind of sequencing reads from different types of experiments to the _Drosophila melanogaster_ (fruit fly) genome using different mappers.
+In this practical we will map different kind of sequencing reads from different types of experiments to the _Arabidopsis thaliana_ (thale cress) genome using different mappers.
 
 ## Software installation and data retrieval
 
@@ -196,9 +196,9 @@ samtools view -bS DNA_PE_hisat.sam | samtools sort > DNA_PE_hisat.bam && rm DNA_
 <details>
 <summary>Which of the mappers ran the fastest, accurding to the "real" time?</summary>
 
-_In my case, the usertimes were 2m46 for HiSat, 3m16 for BWA-mem, and 6m16 for smalt. However, your actual running times can differ depending on server load._
+_In my case, the "real" times were 2m46 for HiSat, 3m16 for BWA-mem, and 6m16 for smalt. However, your actual running times can differ depending on server load._
 
-_Ideally, you perform the same taks multiple times and take the average run time. however, this is outside the scope of this course._
+_Ideally, you perform the same taks multiple times and take the average run time. This is outside the scope of this course however._
 </details>
 
 Running time is one parameter to consider, but we also have to consider the mapping results. We will gather some statistics from the mapping files (`.bam`).
@@ -333,12 +333,12 @@ head TAIR.ss
 ```
 
 <details>
-<summary>What do you think the different collumns mean in these files?</summary>
+<summary>What do you think the different columns mean in these files?</summary>
 
 - _First column: contig/chromosome_
 - _Second column: start of exon/intron_
 - _Third column: end of exon/intro_
-- _Fourth coumn: strand_
+- _Fourth column: strand_
 
 </details>
 
@@ -411,7 +411,7 @@ echo "% reads mapped:" && samtools flagstat $map | grep "mapped (";
 <details>
 <summary>How does STAR compare to HiSat2 in terms of mapping statistics?</summary>
 
-_It has slightly better statistics: higher coverage, more of the genome covered, and all reads could be mapped.
+_It has slightly better statistics: higher coverage, more of the genome covered, and all reads could be mapped._
 </details>
 
 Lastly, we will use Minimap2 to map the long RNA reads we have. Again we need to calculate splice junctions to be able to do the spliced-aware mapping.
@@ -643,7 +643,7 @@ _Indels (insertions and deletions), visualized by the black stripes (deletions) 
 <details>
 <summary>Zoom in all the way and scroll through the chloroplast genome. Look specifically for regions where many of the Nanopore reads have a deletion. Do you see a pattern in where these deletion hotspots occur?</summary>
 
-_The  seem to mainly occur in so-called "homopolymer" stretches: regions where the same base is repeated multiple times (e.g. `TTTTTTTTTT`)_
+_The  seem to mainly occur in so-called "homopolymer" stretches: regions where the same base is repeated multiple times (e.g._ `TTTTTTTTTT`_)_
 </details>
 
 Remove the tracks again, and now load the short read RNA files (RNA_PE_hisat, RNA_PE_hisat_splice, and RNA_PE_STAR). 
