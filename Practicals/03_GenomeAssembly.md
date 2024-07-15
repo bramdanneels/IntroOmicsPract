@@ -25,7 +25,7 @@ You can make a copy of the data you will be working on by running this command f
 
 ```
 mkdir -p Practical3
-ln -s /storage/Pract3_Assembly/Data/* Practical3/
+ln -s /storage/03_Assembly/* Practical3/
 ```
 > `mkdir -p` creates a folder called Practical3. The "-p" options tells mkdir to create subdirectories if necessary, and to not give an error if the folder(s) already exist
 > `ln -s` creates what we call a "symbolic link". This creates a small file that just says "Instead of this file, use the file that I'm liking to". This allows you to "copy" files without actually having to make a physical copy.
@@ -36,12 +36,14 @@ Now, go to the newly created directory (by running `cd Practical3`), and you are
 
 You will first have to setup the correct environment with the necessary tools. See [the intro practical](00_IntroSetup.md) on how to install mamba, and how to create an enviroment for downloading the necessary data.
 
-To create a new environment including the necessary tools for this practical, run the following command:
+We need to create two enviroments: one for assembly, and one for BUSCO. BUSCO has some very specific requirements, which are difficult to combine with other tools. 
+We whill thus install it in its own environment. To create the two environments including the necessary tools for this practical, run the following command:
 
 ```
-mamba create -n Assembly spades abyss megahit quast busco canu flye hifiasm
+mamba create -n BUSCO busco
+mamba create -n Assembly spades abyss megahit quast canu flye hifiasm
 ```
-> This will create a new environment called "Assembly" with the necessary tools.
+> This will create two new environments called "BUSCO" and "Assembly" with the necessary tools.
 
 Create a new folder (e.g. `Practical3`), go into it (`cd Practical3`), and then download the necessary data, by either:
 
@@ -85,23 +87,29 @@ For an overview of where the data comes from, see the [information sheet on Zeno
 
 ## Quality Control
 
-Before assembling the genome, it is important to take a look at our data. Go back to the QC environment created in practical 2: `mamba activate QC`.
-Then, run FastQC on both files, and look at the reports.
+Before assembling a genome, it is important to take a look at the data. Go back to the QC environment created in practical 2: `mamba activate QC`.
+Then, run FastQC on all four files, download the files, and look at the reports.
 
 <details>
 <summary>How many reads are in this dataset, and how long are the reads?</summary>
 
-_There are 387 568 reads in the dataset, all of them 150bp long._
+_Illumina: There are 387 568 reads in the dataset, all of them 150bp long._
+
+_Nanopore: 54857 reads, ranging from 117 to 34528 bp_
+
+_HiFi: 50000 reads, ranging from 641 to 40383 bp_
 </details>
 
 <details>
 <summary>Based on the report, is adapter and/or quality trimming necessary?</summary>
 
-_No: The quality scores are all above Q30, and there are no adapters detected in both read files_
+_Not for Illumina: The quality scores are all above Q30, and there are no adapters detected in both read files._
+
+_The long reads show some adapters, and Nanopore has low-quality reads, but we will not trim the reads for this practical._
 </details>
 
 <details>
-<summary>Given that the genome size of M. genitalium is +- 580 kbp, what coverage do we expect to have with our read set?</summary>
+<summary>Given that the genome size of M. genitalium is +- 580 kbp, what coverage do we expect to have with the Illumina read set?</summary>
 
 _200x coverage_
 
@@ -130,7 +138,7 @@ The assembly can take some minutes to complete. In the meantime, you can try ans
 _According to the SPAdes manual:_
 
 - _The `--isolate` option: This flag is highly recommended for high-coverage isolate and multi-cell Illumina data; improves the assembly quality and running time. We also recommend trimming your reads prior to the assembly._
-- _The `careful` option : Tries to reduce the number of mismatches and short indels. Also runs MismatchCorrector - a post processing tool, which uses BWA tool (comes with SPAdes). This option is recommended only for assembly of small genomes. We strongly recommend not to use it for large and medium-size eukaryotic genomes._
+- _The `--careful` option : Tries to reduce the number of mismatches and short indels. Also runs MismatchCorrector - a post processing tool, which uses BWA tool (comes with SPAdes). This option is recommended only for assembly of small genomes. We strongly recommend not to use it for large and medium-size eukaryotic genomes._
 </details>
 
 <details>
@@ -168,7 +176,7 @@ We will have a more detailed look at these assemblies later in the practical
 
 [Abyss](https://github.com/bcgsc/abyss) is a genome assembler that can be used for assemblies of all sizes using short reads. We will run it here using the default settings.
 As you might have noticed, SPAdes tried assembling the reads using different values for _k_, and then picks the best one. 
-ABySS does does not have this capacity, so we will have to rune ABySS by specifying our own _k_-values. We will run ABySS here using a _k_-value of 31 and 75:
+ABySS does does not have this capacity, so we will have to run ABySS by specifying our own _k_-values. We will run ABySS here using a _k_-value of 31 and 75:
 
 ```
 mkdir -p Abyss_k31 Abyss_k75
@@ -295,7 +303,6 @@ _The NG50 of AssemblyA is still 250kbp (we can build an assembly of 1.25 Mbp usi
 _Thus, NG50 is a better metric to assess an assembly, but it requires you to have a reference genome, or to know how large the genome should be._
 </details>
 
-
 <details>
 <summary>Which assembly covers the largest fraction of the reference genome?</summary>
 
@@ -332,6 +339,7 @@ The BUSCO tool uses a database which contains sets of conserved genes (universal
 By checking how much of the genes that should be in your assembly, you can have a rough idea of how complete your assembly is.
 
 We will run BUSCO on the SPAdes-isolate assembly, the ABySS-k75 assembly, and the ABySS-k31 assembly. The most important step to running BUSCO is figuring out what lineage to use.
+BUSCO doesn't always run nicely with other programs, thus we had to install it in a separate environment (called "BUSCO"). So first activate the enviroment BUSCO (`mamba activate BUSCO`).
 To get an overview of which lineages are available, you can run the following commands:
 
 ```
@@ -387,12 +395,15 @@ Below you can find the commands for running the assemblies normally. If you are 
 To do this, we will be using a combination of acommand called `nohup` and the background command `&`. 
 The `nohup` command will tell the server to not stop a command on "hangup" (i.e. when disconnecting from the server), and the `&` command will tell the server to run the process in the background so we can do other stuff in the meantime (like log out from the server).
 To run a command using `nohup` and `&`, simply put `nohup` in front of the command, and `&` at the end of the command. The output of your command will be saved to a file called `nohup.out`.
-> For example, the command `fastqc sample.fastq` would become `nohup fastqc sample.fastq &`
+> For example, the command `fastqc sample.fastq` would become `nohup fastqc sample.fastq &`.
+> Note that if you are working on your own computer, the nohup'ed command will still stop if you turn off your computer.
+
+Remember to reactivate the `Assembly` enviroment before assembling!
 
 ```
 canu -p canu -d MycOvi_Canu genomeSize=1.1m maxThreads=4 -nanopore MycOvi_Nano.fastq
 ```
-> `-p` determines the prefix (so in our case all outputfiles will start with "canu"); `-p` sets the name of the output directory
+> `-p` determines the prefix (so in our case all outputfiles will start with "canu"); `-d` sets the name of the output directory
 
 We can now find the assembly in `MycOvi_Canu/canu.contigs.fasta`.
 

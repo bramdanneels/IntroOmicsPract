@@ -12,7 +12,7 @@ In this tutorial, we will have a look at the following mapping and related softw
 - [HiSat2](https://daehwankimlab.github.io/hisat2/) - A fast and sensitive aligner for DNA and RNA
 - [STAR](https://github.com/alexdobin/STAR) - A very popular RNA-seq aligner
 - [Minimap2](https://github.com/lh3/minimap2) - A versatile aligner for sequences of any length, both DNA and RNA
-- [bamtools](https://github.com/samtools/samtools) - A very handy toolkit for handling alignment data (`.sam` and `.bam` files) 
+- [samtools](https://github.com/samtools/samtools) - A very handy toolkit for handling alignment data (`.sam` and `.bam` files) 
 
 ### For students using NREC
 
@@ -24,7 +24,7 @@ You can make a copy of the data you will be working on by running this command f
 
 ```
 mkdir -p Practical4
-ln -s /storage/Pract4_Assembly/Data/* Practical4/
+ln -s /storage/04_Mapping/* Practical4/
 ```
 > `mkdir -p` creates a folder called Practical4. The "-p" options tells mkdir to create subdirectories if necessary, and to not give an error if the folder(s) already exist
 > `ln -s` creates what we call a "symbolic link". This creates a small file that just says "Instead of this file, use the file that I'm liking to". This allows you to "copy" files without actually having to make a physical copy.
@@ -418,11 +418,11 @@ Lastly, we will use Minimap2 to map the long RNA reads we have. Again we need to
 
 ```
 paftools.js gff2bed TAIR.gtf > TAIR.bed
-minimap2 -ax splice --junc-bed TAIR.bed -uf -k14 TAIR.fasta Atha_RNA_Nano.fastq.filt | samtools view -bS | samtools sort > RNA_NanoPore.bam
+minimap2 -t 2 -ax splice -uf -k14 --junc-bed TAIR.bed TAIR.fasta Atha_RNA_Nano.fastq.filt | samtools view -bS | samtools sort > RNA_NanoPore.bam
 ```
 > We use `paftools` to convert the `.gtf` annotation file to a `.bed` file containing the coordinates of exons and introns.
 > The `-uf` option forces minimap2 to only use the forward strand, as we're dealing with RNA transcripts. 
-> The `-k` parameters sets the word length for the genome index. 
+> The `-k` parameters sets the word length for the genome index. This is lowered because we are dealing with noisy Nanopore data
 > The `splice` option, as you might have guessed, tells minimap2 to do spliced alignment.
 
 Now let's calculate the statistics:
@@ -505,14 +505,14 @@ Let's try the opposite again: mapping short reads with a long-read mapper (Minim
 > Minimap2 can actually map short reads, but here we will use the long-read mapping mode instead.
 
 ```
-minimap2 -ax map-ont TAIR.fasta Atha_DNA_SE.fastq.filt | samtools view -bS | samtools sort > DNA_SE_minimapLR.bam
+minimap2 -t 2 -ax map-ont TAIR.fasta Atha_DNA_SE.fastq.filt | samtools view -bS | samtools sort > DNA_SE_minimapLR.bam
 ```
 
 Since we haven't mapped the SE reads yet, we'll have to do that to be able to compare the statistics.
 Let's use the minimap2 short read mode to do this:
 
 ```
-minimap2 -ax sr TAIR.fasta Atha_DNA_SE.fastq.filt | samtools view -bS | samtools sort > DNA_SE_minimapSR.bam
+minimap2 -t 2 -ax sr TAIR.fasta Atha_DNA_SE.fastq.filt | samtools view -bS | samtools sort > DNA_SE_minimapSR.bam
 ```
 
 Then we can compare the statistics of both:
@@ -561,10 +561,11 @@ Now we have to download both the `bam` files and their indexes to our local pc (
 You can do this using the following command (remember to replace the parts between curly brackets (`{}`) with your relevant details!)
 > Make sure your running this command from a temrinal on your own pc, not connected to the server.
 > The total size of the download is 1.75 Gb, if you don't have enough space on your disk, you can try downloading only a few files at a time.
+> You can replace `{target directory}` with `./` if you want to download the files to the folder from which you are running the command.
 
 ```
-scp -i {path to private key} '{username}@{NREC server ip}:/home/{username}/Practical4/\*.bam' {target directory}
-scp -i {path to private key} '{username}@{NREC server ip}:/home/{username}/Practical4/\*.bam.bai' {target directory}
+scp -i {path to private key} '{username}@[{NREC server ip}]:/home/{username}/Practical4/*.bam' {target directory}
+scp -i {path to private key} '{username}@[{NREC server ip}]:/home/{username}/Practical4/*.bam.bai' {target directory}
 ```
 
 Once you have downloaded the files, you can launch IGV.
