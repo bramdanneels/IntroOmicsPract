@@ -1,14 +1,24 @@
 # BINF201 – Practical 6 – Metagenomics
 
-For this practical, you will need to have installed and configured Conda. If this is not the case, see [here](https://docs.conda.io/en/latest/miniconda.html) for installation instructions for your system.
+In this practical we will be having a look at metagenomic data. We will perform metagenome assemblies and perform binning to try to recover full genomes.
+In addition we will have a look at marker-gene based analysis (e.g. 16S) and how to analyse those.
 
-> For Windows users, it is preferable to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install), and install conda on there using the Linux install instructions.
+## Software installation and data retrieval
 
-In this practical we will work with metagenomic data. We will analyze both shotgun sequencing data and amplicon sequencing data.
+In this tutorial, we will have a look at the following metagenomics and related software:
 
-## Software setup & data retrieval
-
-As usual, we will set up a Conda environment with the necessary tools. However, as we have many different tools to install, installation will run smoother using Mamba instead of Conda. If you have not already installed [mamba](https://mamba.readthedocs.io/en/latest/user_guide/mamba.html), you can do this now by running:
+- [MetaSPAdes](https://www.sanger.ac.uk/tool/smalt/) - A relatively fast short read aligner for DNA
+- [MegaHit](https://github.com/bwa-mem2/bwa-mem2) - An popular all-purpose aligner
+- [MetaFlye](https://daehwankimlab.github.io/hisat2/) - A fast and sensitive aligner for DNA and RNA
+- [Conconct](https://github.com/alexdobin/STAR) - A very popular RNA-seq aligner
+- [Autometa?](https://github.com/lh3/minimap2) - A versatile aligner for sequences of any length, both DNA and RNA
+- [Kraken2](https://github.com/samtools/samtools) - A very handy toolkit for handling alignment data (`.sam` and `.bam` files) 
+- [Metaphlan]()
+- [CheckM]()
+- [KrakenTools]()
+- [Bracken]()
+- [Hclust2]()
+- Other binner?
 
 	conda install mamba
 
