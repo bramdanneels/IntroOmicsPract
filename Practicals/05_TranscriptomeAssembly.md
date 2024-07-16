@@ -465,7 +465,7 @@ The we need to download the necessary files: the reference data, the Stringtie a
 People on NREC can use the commands below to download the necessary files to their computer:
 > Remember to open a new terminal which is not connected to NREC, and to replace the parts between curly brackets (`{}`) with your relevant information.
 > You can replace `{target directory}` with `./` if you want to download the files to the folder from which you are running the command.
-> The total download size is +- XX
+> The total download size is +- 275 Mbp
 
 ```
 scp -i {path to private key} '{username}@[{NREC server ip}]:/home/{username}/Practical5/Chr15.fasta' {target directory}
