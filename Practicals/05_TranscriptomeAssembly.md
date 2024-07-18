@@ -1,4 +1,3 @@
-
 # BINF201 – Practical 5 – Transcriptome Assembly
 
 In this practical we will perform transcriptome assemblies on a dataset containing RNA-seq reads mapping to the human chromosome 15.
@@ -17,15 +16,16 @@ In this tutorial, we will have a look at the following software:
 
 ### For students using NREC
 
-The data and software has been setup on the NREC server. Before starting the practical, make sure to activate the correct environment before each part of the tutorial 
-(`QC` for the QC part, `Transcriptome` for the transcriptome part)
+The data and software has been setup on the NREC server. 
+Before starting the practical, make sure to activate the correct environment before each part of the tutorial 
+(e.g. `QC` for the QC part, `Transcriptome` for the transcriptome part, `BUSCO` for running BUSCO)
 
 You can make a copy of the data you will be working on by running this command from your home directory:
 > If your not sure if you are in the home folder, run `cd` or `cd ~` to go to your home directory.
 
 ```
 mkdir -p Practical5
-ln -s /storage/05_Transcriptome/* Practical5/
+ln -s /storage/data/05_Transcriptome/* Practical5/
 ```
 > `mkdir -p` creates a folder called Practical5. The "-p" options tells mkdir to create subdirectories if necessary, and to not give an error if the folder(s) already exist
 > `ln -s` creates what we call a "symbolic link". This creates a small file that just says "Instead of this file, use the file that I'm liking to". 
@@ -46,7 +46,8 @@ mamba create -n Transcriptome trinity hisat2 samtools busco minimap2 stringtie g
 > This will create a new environment called "Transcriptome" with the necessary tools.
 > The ncbi-datasets-cli will allow us to download our reference genome.
 
-Create a new folder (e.g. `Practical5`), go into it (`cd Practical5`), and then download the necessary data, by either:
+Create a new folder (e.g. `Practical5`), go into it (`cd Practical5`), and then download the necessary data.
+You can either:
 
 - Download directly from the [Zenodo repository]():
 
@@ -63,8 +64,10 @@ gunzip *gz
 
 > Important: Part of the data-prep is mapping the reads to Chr15. It is not recommended to do this on a normal desktop computer.
 > Running the commands as they are written (i.e. with only 2 cores) might take multiple hours to complete the mappings!
-> If you don't have access to high-performance computing resources, we highly recommend downloading the prepared files from Zenodo (see above)
+> If you don't have access to high-performance computing resources, we highly recommend downloading the prepared files from Zenodo (see above).
 
+<details>
+<summary>Click here to expand the command necessary for setting up the data yourself</summary>
 ```
 datasets download genome accession GCF_000001405.40 --chromosomes 15 --include genome,gtf
 unzip ncbi_dataset.zip
@@ -89,7 +92,7 @@ mv SRR24153956.fastq RNA_HiFi.fastq
 rm -r SRR24153956*
 
 hisat2-build Chr15.fasta Chr15.index
-hisat2 -p 2 -x Chr15.index -1 RNA_PE_1 -2 RNA_PE_2.fastq -S RNA_PE.sam
+hisat2 -p 2 -x Chr15.index -1 RNA_PE_1.fastq -2 RNA_PE_2.fastq -S RNA_PE.sam
 samtools view -b -F 4 RNA_PE.sam | samtools sort -n > RNA_PE.bam
 samtools fastq -1 RNA_PE_F_Chr15.fastq -2 RNA_PE_R_Chr15.fastq -0 /dev/null -s /dev/null RNA_PE.bam
 
@@ -98,22 +101,24 @@ minimap2 -t 2 -ax splice -uf -k14 --junc-bed HomSap.bed Chr15.fasta RNA_Nano.fas
 samtools view -b -F 4  RNA_Nano.sam | samtools sort > RNA_Nano.bam
 samtools fastq RNA_Nano.bam > RNA_Nano_Chr15.fastq
 
-minimap2 -t 60 -ax splice:hq -uf --junc-bed HomSap.bed Chr15.fasta RNA_HiFi.fastq > RNA_HiFi.sam
+minimap2 -t 2 -ax splice:hq -uf --junc-bed HomSap.bed Chr15.fasta RNA_HiFi.fastq > RNA_HiFi.sam
 samtools view -b -F 4 RNA_HiFi.sam | samtools sort > RNA_HiFi.bam
 samtools fastq RNA_HiFi.bam > RNA_HiFi_Chr15.fastq
 
 rm RNA_Nano.fastq RNA_HiFi.fastq RNA_PE_1.fastq RNA_PE_2.fastq *bam *sam
 ```
+</details>
 
 ## The Data
 
-The data for this tutorial are paired Illumina RNA-seq reads, Nanopore RNA, and PacBio HiFi reads from human cells. 
-All read sets have been mapped to the Chr15 chromosome and mapped reads were extracted.
-For an overview of where the data comes from, see the [information sheet on Zenodo]().
+The data for this tutorial are paired Illumina RNA-seq reads, Nanopore RNA, and PacBio HiFi RNA reads from human cells. 
+All read sets have been mapped to the Chr15 chromosome and the mapped reads were extracted.
+For an overview of the data used in this practical, please see the [information sheet on Zenodo]().
 
 ## Quality control
 
-As should be the habit by now, we will have a look at read QC first. Run FastQC on the four files, and look at the reports.
+As should be the habit by now, we will have a look at read QC first. 
+Run FastQC on the four files, and look at the reports.
 
 <details>
 <summary>How many reads are in each file?</summary>
@@ -124,8 +129,8 @@ _367 483 reads in the Nanopore dataset; 203 195 reads in each Illumina dataset; 
 <details>
 <summary>What are the longest Nanopore and HiFi reads? Is this expected?</summary>
 
-_The longest nanopore read is "only" 5015bp long, the longest HiFi read is 12288bp long._
-This is shorter than expected for long reads, but is normal since we are only sequencing transcripts, which have a limited length._
+_The longest Nanopore read is "only" 5015bp long, the longest HiFi read is 12288bp long._
+_This is shorter than expected for long reads, but is normal since we are only sequencing transcripts, which have a limited length._
 </details>
 
 <details>
@@ -145,19 +150,20 @@ cutadapt -q 20,20 -m 30 --poly-a -o temp.fastq RNA_Nano_Chr15.fastq
 mv temp.fastq RNA_Nano_Chr15.fastq
 ```
 
-Note that cutadapt can do some basic trimming, but it is recommended to use proper long-read trimmers on long reads.
+Note that cutadapt can do some basic trimming, but it is recommended to use proper long read trimmers on long reads.
 In addition is it recommended to perform read correction on Nanopore (e.g. using short reads) to improve their quality, and to prevent errors.
 
 ## Reference-based assembly
 
-We will start by having a look at reference-based assembly. Reference-based means we will use the reference genome to guide our transcriptome assembly.
+We will start by having a look at reference-based transcriptome assembly. 
+Reference-based means we will use the reference genome to guide our transcriptome assembly.
 To do this, we need to first map the reads to the genome, and then use a transcriptome assembler to assembly the actual transcripts.
 Here we will use [Hisat2](https://daehwankimlab.github.io/hisat2/) and [Minimap2](https://github.com/lh3/minimap2) to map the reads to the genome,
 and [Stringtie2](https://github.com/skovaka/stringtie2) to assemble the mapped reads.
 
-However, first we need to get our reference genome (in our case human Chr15) and annotation (for the whole genome). 
+However, first we need to get our reference genome (in our case human Chr15) and reference annotation (for the whole genome). 
 We can download the correct files using [NCBI-datasets](https://www.ncbi.nlm.nih.gov/datasets/):
-> If you downloaded the data manually instead of copied from NREC or from Zenodo, you don't need to do this step
+> If you downloaded and processed the data manually instead of copied from NREC or from Zenodo, you don't need to do this step
 
 ```
 datasets download genome accession GCF_000001405.40 --chromosomes 15 --include genome,gtf
@@ -172,7 +178,7 @@ Let's take a look at the reference sequence. You can view a file on the command 
  ```
  less Chr15.fasta
  ```
- > You can use the arrow keys to move the cursor, `PgUp` and `PgDn` to go to the previous or next page.
+ > You can use the arrow keys to move the cursor, `PgUp` and `PgDwn` to go to the previous or next page.
  > You can press `g` to go the the beginning of the file, or `G` to go to the end of the page.
  > Press `Q` to exit the program.
 
@@ -184,7 +190,8 @@ _There are two ways of masking: soft-masking and hard-masking._
 _In softmasking, the repeats are marked in lowercase letters. In hardmasking the repeats are replaced by `N`s._
 _The main reason to do repeatmasking is because eukaryotic sequences contain a lot of repeats._
 _But for a lot of applications (e.g. RNA-seq mapping or genome annotation) we don't really care about the repeats._
-_By masking the repeat we tell our programs to not look in these regions. This means they have to only consider a smaller part of the genom, increasing running time._
+_By masking the repeats we tell our programs to not look in these regions. This means they have to only consider a smaller part of the genom, increasing running time._
+_The reason we have a lot of `N`'s at the beginning and end of our sequence, is because those are the telomeres which are very repetitive sequences._
 </details>
 
 Now open the annotation file (`HomSap.gtf`) using the same command.
@@ -197,7 +204,7 @@ _To get an overview of what the different columns mean, see [here](https://www.e
 </details>
 
 Now that we had a look at the reference genome, we can start performing our reference-based transcriptome assembly.
-We'll start by assembling the short reads. To do this, we'll map the first to the genome using HiSat2.
+We'll start by assembling the short reads. To do this, we'll map them first to the reference genome using HiSat2.
 Similar to what we did in the [mapping practical](04_ReadMapping.md), we will identify the splice sites, and use that information to build the genome index.
 
 ```
@@ -214,7 +221,8 @@ hisat2 -p 2 --dta -x Chr15.index --max-intronlen 5000 \
 | samtools view -Sb \
 | samtools sort > RNA_PE_Chr15.bam
 ```
-> The `--dta` option of hisat2 is to tell the software to produce an output tailored for transcriptome assembly. If you want to do just mapping, you can omit this option.
+> The `--dta` option of hisat2 is to tell the software to produce an output tailored for transcriptome assembly. 
+> If you want to do just mapping, you can omit this option.
 
 <details>
 <summary>HiSat prints some mapping statistics to the screen. Based on those, did the mapping go well?</summary>
@@ -235,15 +243,17 @@ This outputs a new `.gtf` file, similar to the one of the reference. This `.gtf`
 We can use GFFcompare to compare some of the statistics between our transcripts, and the transcripts in the reference.
 
 As the name suggests, this tool compares two gff files, and calculate some statistics that might help you assess the quality of the annotation.
-Luckily for us, `gtf` files are just a special type of `gff`, so we can also compare `gtf` files using GFFcompare.
+Luckily for us, `gtf` files are just a special type of `gff` file, so we can also compare `gtf` files using GFFcompare.
 
 ```
 gffcompare -r HomSap.gtf -o PE_gffcompare.txt PE_stringtie.gtf
 ```
 
 You will likely get an error: `Error: no valid ID found for GFF record`.
-This means there is something wrong with our files. A quick google search of the error learns us that it is a problem with [the version of the reference `gtf` file](https://github.com/gpertea/stringtie/issues/361).
-Luckily there is a solution mentioned in the last comment: we either get our hands on a GFF3 file, or we remove some lines. Here we'll download the GFF3 annotation from human:
+This means there is something wrong with our files.
+A quick google search of the error learns us that it is a problem with [the version of the reference `gtf` file](https://github.com/gpertea/stringtie/issues/361).
+Luckily there is a solution mentioned in the last comment: we either get our hands on a GFF3 file, or we remove some lines from the `gtf`. 
+Here we choose to download the GFF3 annotation from human:
 
 ```
 datasets download genome accession GCF_000001405.40 --chromosomes 15 --include gff3
@@ -257,29 +267,33 @@ Now we can run gffcompare again using the `gff3` file instead:
 ```
 gffcompare -r HomSap.gff3 -o PE_gffcompare.txt PE_stringtie.gtf
 ```
-> We set the reference annotation as the human annotation, as that's the one we want to compare with.
+> We set the reference annotation (`-r`) as the human annotation, as that's the one we want to compare with.
 
 This time it works. Since the file is quite small, we can print the content to the screen by runing `cat PE_gffcompare.txt`
 This will give us some statistics about our transcripts.
 
-There are two main parameters we're considering here: Sensitivity and Precision. To learn more about these, see the [documentation](https://ccb.jhu.edu/software/stringtie/gffcompare.shtml#output-files).
-To understand how these parameters work we need to know a bit about making predictions and errors. In short, when we predict a transcript, there are four possible possibilities:
+There are two main parameters we're considering here: Sensitivity and Precision. 
+To learn more about these, see the [gffcompare documentation](https://ccb.jhu.edu/software/stringtie/gffcompare.shtml#output-files).
+To understand how these parameters work we need to know a bit about making predictions and errors. 
+In short, when we predict a transcript, there are four possible possibilities:
 
-1) We predict a transcript, and there is a transcript in the reference: Correct prediction -> True positive (TP)
-2) We don't predict a transcript, and there is no transcript in the reference: Correct prediction -> True negative (TN)
-3) We predict a transcript, but there is no transcript in the reference: Wrong prediction -> False positive (FP)
-4) We don't predict a transcript, but there is a transcript in the reference: Wrong prediction -> False negative (FN)
+1) We predict a transcript in a location, and there is a transcript on that location in the reference: Correct prediction -> True positive (TP)
+2) We don't predict a transcript in a location, and there is no transcript in the reference: Correct prediction -> True negative (TN)
+3) We predict a transcript in a location, but there is no transcript in the reference on that location: Wrong prediction -> False positive (FP)
+4) We don't predict a transcript in a location, but there is a transcript in the reference on that location: Wrong prediction -> False negative (FN)
 
-> Obviously, we don't really consider 2) in this case, as it is not difficult to assess.
+> Obviously, we don't really consider case 2 in this case, as it is difficult to assess.
 
-In GFF compare Sensitivity and Precision are calculated as follows:
+In GFFcompare Sensitivity and Precision are calculated as follows:
 
-- Sensitivity is calculated as $TP/(TP+FN)$: This tells us how many of the transcripts in the reference we can recover in our Stringtie transcripts
-- Precision is calculated as $TP/(TP+FP)$: This tells us how many of the transcripts we predicted are also found in the reference (what proportion of our predictions is correct).
+- Sensitivity is calculated as $TP/(TP+FN)$: This tells us how many of the transcripts from the reference we have predicted in our Stringtie transcripts (i.e. how many reference transcripts can we recover).
+- Precision is calculated as $TP/(TP+FP)$: This tells us how many of the transcripts we have predicted in our Stringtie transcripts are also present in the reference (i.e. what proportion of our predictions is correct).
 
-GFFcompare calculates these on different levels: base, exon, intron, intron chain, transcript, and locus. Based on the the output we have, it looks like we have very low sensitivity (i.e. We don't manage to predict a lot of the reference transcripts).
-The precision is quite good on base, exon, and intron level, but not so great on intron chain, transcript, and locus level. If you want to know what htese levels mean, see the [documentation](https://ccb.jhu.edu/software/stringtie/gffcompare.shtml#output-files).
-The statistics on the bottom also tell us how many exons/introns/loci we have missed, and how many novel we have (False Negatives and False positives respectively).
+GFFcompare calculates these statistics on different levels: base, exon, intron, intron chain, transcript, and locus. 
+Based on the the output we have, it looks like we have very low sensitivity (i.e. we don't manage to predict a lot of the reference transcripts).
+The precision is quite good on base, exon, and intron level, but not so great on intron chain, transcript, and locus level. 
+If you want to know what these levels are exactly, have a look at the [documentation](https://ccb.jhu.edu/software/stringtie/gffcompare.shtml#output-files).
+The statistics on the bottom also tell us how many exons/introns/loci we have missed, and how many novel features we have (False Negatives and False positives respectively).
 
 <details>
 <summary>Why do you think the predictions are so bad?</summary>
@@ -287,8 +301,9 @@ The statistics on the bottom also tell us how many exons/introns/loci we have mi
 _Because we are comparing the predictions for Chr15 only, to the annotation of the whole genome. That is why we miss so many exons/introns/loci._
 </details>
 
-To do a better comparison, we have to compare only the reference annotation of Chr15. So we'll have to filter the reference annotation. This means we only need annotations that are located on Chr15.
-So first we need to find all the sequences that are part of Chr15. We can get these as follows:
+To do a better comparison, we have to compare only the reference annotation of Chr15 with our predictions. 
+So we'll have to filter the reference annotation. This means we only need annotations that are located on Chr15.
+We first need to find all the sequences that are part of Chr15. We can get these as follows:
 
 ```
 grep ">" Chr15.fasta
@@ -313,9 +328,12 @@ cat PE_Chr15_gffcompare.txt
 We see that the sensitivity has gone up by a lot, but is still not optimal. The precision is still the same, which makes sense.
 Judging from the total number of loci (1616 in the reference, 912 in our stringtie), we likely don't have enough reads mapping to this chromosome to get the full transcriptome.
 
-Let's see if we can do a better job using long reads. Since we're dealing with long reads we'll have to use a different mapper. We will be using minimap2 to do splice-aware alignment.
-However, these mapping can easily take multiple hours to complete on 2 cores. In additon, Stringtie takes quite a bit of time as well to assemble the long transcripts we have here.
-Since we don't have that much time nor computation power during the practicals, the resulting stringtie annotations (`.gtf`) have been provided if you are working on NREC or downloaded the data from Zenodo.
+Let's see if we can do a better job using long reads. Since we're dealing with long reads we'll have to use a different mapper. 
+We will be using minimap2 to do splice-aware alignment.
+However, these mapping can easily take multiple hours to complete on 2 cores. 
+In additon, Stringtie takes quite a bit of time as well to assemble the long transcripts we have here.
+Since we don't have that much time nor computation power during the practicals, 
+the resulting stringtie annotations (`.gtf`) have been provided if you are working on NREC or downloaded the data from Zenodo.
 In case you want to run the mapping yourself, you can see the commands in the comment below.
 
 >```
@@ -340,20 +358,20 @@ cat Long_Chr15_gffcompare.txt
 ```
 
 <details>
-<summary>How do the statistics compare to each other, and to the short-read assembly?</summary>
+<summary>How do the statistics compare to each other, and to the short read assembly?</summary>
 
-_The HiFi reads have better stats than the Nanopore reads (higher sensitivity and precision)._
-_However both long read assemblies have a lot lower precision comapred to the short reads._
+_The HiFi-based transcriptome has better results than the Nanopore reads (higher sensitivity and precision)._
+_However both long read assemblies have a lot lower precision compared to the short reads._
 _When looking at the number of predicted transcripts, it looks like the long reads create a lot of transcripts (especially Nanopore)._
 </details>
 
 An important remark to make in this analysis is that we are dealing with a small dataset (one chromosome), and we are using most of the tools on default settings.
+Additionally, we have not properly pre-processed our long reads (e.g. Nanopore polishing).
 To generate beter results from this data, a lot more careful mapping and assembly has to be performed. This is however outside of the scope of this course.
-In addition are the Nanopore reads not error-corrected. This means 
 
 ## _De novo_ transcriptome assembly
 
-In case no no reference genome is available to guide the transcriptome assembly, we can still try assembling it _de novo_.
+In case no reference genome is available to guide the transcriptome assembly, we can still try assembling it _de novo_ (from scratch).
 For this we will use a software called [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki).
 
 Trinity is a quite resource-intensive program. 
@@ -383,8 +401,8 @@ _Trinity\_PE: 4465; Trinity\_HiFi: 4439_
 
 Since we don't have a reference genome, we can't create a gtf or gff that we can compare to the reference. 
 One way to test if our transcriptome is good, is to run BUSCO to see how complete the transcriptome is.
-As the transcriptomes are quite large, it can take a bit of time (+- 30m-1h) to do the busco analysis.
-We show you the commands on how to run BUSCO (using the `-m trans` mode because we are working on transcriptomes), but also provide the resulst already.
+As the transcriptomes are quite large, it can take a bit of time (+- 30m-1h) to do the busco analysis with only 2 cores.
+We show you the commands on how to run BUSCO (using the `-m trans` mode because we are working on transcriptomes), but also provide the output below.
 
 ```
 busco -c 2 -m trans -i Trinity_PE.fasta --lineage primates
@@ -416,7 +434,7 @@ busco -c 2 -m trans -i Trinity_HiFi.fasta --lineage primates
 <details>
 <summary>Compare the BUSCO scores. Are they similar? Why are they so low?</summary>
 
-_There is only a minor difference in BUSCO scores. Using HiFi reads to aid the assembly, we _
+_There is only a minor difference in BUSCO scores (a couple of genes)._
 _The BUSCO scores are so low because we are only working on one chromosome. Chr15 is one of the smaller chromosomes, and thus has generally less genes._
 _This means we will only pick up a very small fraction of the total BUSCO genes, as these are spread over the whole genome._
 </details>
@@ -424,16 +442,18 @@ _This means we will only pick up a very small fraction of the total BUSCO genes,
 <details>
 <summary>What would the BUSCO scores be if we used RNA-seq data for the whole genome?</summary>
 
-_The score would be higher, but probably still lower than compared to running BUSCO on a genome._
-_This is because not all genes are expressed at all times in a cell._
-_So, when sampling cells for their RNA, this will only give you a snapshot of what is happening. A lot of genes are specific for certain cell types, tissues, times, etc., and will not show up in ever RNA-seq experiment._
+_The score would be higher, but probably still lower than compared to running BUSCO on a whole genome._
+_This is because not all genes are expressed at all times in a cell/tissue._
+_So, when sampling cells for their RNA, this will only give you a snapshot of what is happening._
+_A lot of genes are specific for certain cell types, tissues, times, etc., and will not show up in ever RNA-seq experiment._
 </details>
 
-Thus, BUSCO might not be the best tool to assess if our transcriptome is good, but it could give us an idea. Without reference genome (since you would only use Trinity if you don't have a reference),
-we don't have anything to compare to, so no way of fully assessing the quality of our transcriptome.
+Thus, BUSCO might not be the best tool to assess if our transcriptome is good, but it could give us a rough idea. 
+Without reference genome (since you would only use Trinity if you don't have a reference),
+we don't have anything to compare to, so there is no way to fully assess the quality of our transcriptome.
 
 In our case we do have a reference genome. Instead of trying to generate a gff/gtf file, we will just map the transcripts to the genome and visualise the mapping in IGV (see later).
-In Minimap2 there is no preset option to map transcripts to a genome, we'll treat them as high-quality, long RNA reads.
+In Minimap2 there is no preset option to map transcripts to a genome, so we'll treat them as high-quality, long RNA reads.
 Since we're only mapping +- 4500 transcripts to the genome, this mapping goes very fast.
 
 ```
@@ -441,51 +461,53 @@ minimap2 -t 2 -ax splice:hq -uf --junc-bed HomSap.bed Chr15.fasta Trinity_PE.fas
 minimap2 -t 2 -ax splice:hq -uf --junc-bed HomSap.bed Chr15.fasta Trinity_HiFi.fasta | samtools view -b | samtools sort > TranscriptMap_HiFi.bam
 ```
 
-We will use the generated files in the next section for visualisation.
+We will use the generated bam files in the next section for visualisation.
 	
 ## Visualisation
 
-We have now different predicted transcripts. Some are from Stringtie (which gives `.gtf` files), others from Trinity (`fasta` files) which we mapped to the genome (`bam` files).
-We will download these annotations and mappings to have a look how they compare to the reference annotation.
+We have now different sets of predicted transcripts. 
+Some are from Stringtie (which gives `.gtf` files), others from Trinity (`fasta` files) which we mapped to the genome (`bam` files).
+We will download these annotations and mappings to have a look at how they compare to the reference genome annotation.
 
-First of all, we need generate the bam indexes (`.bai`) for our bam files:
+First of all, we need to generate the bam indexes (`.bai`) for our bam files:
 
 ```
 for bam in *bam; do samtools index $bam; done
 ```
 
-We also need our reference. Technically, the Human reference genome is included in IGV, but since we're dealing with only a subset, we will need to download the fasta and the annotation of Chr15 only.
-We have the `.fasta` file already, and we have a `.gff3` file as well. However, IGV doesn't really like `gff3`, and prefers `gtf`. Thus, we need to first create a Chr15-only `gtf`:
+We also need our reference. Technically, the Human reference genome is included in IGV, but since we have worked with only Chr15, we will have to download our fasta and annotation. 
+We have the `.fasta` file already, and we have a `.gff3` file as well. 
+However, IGV doesn't really like `gff3` and prefers `gtf`. Thus, we need to first create a Chr15-only `gtf`:
 
 ```
 grep "^NC_000015.10" HomSap.gtf > Chr15.gtf
 ```
 
-The we need to download the necessary files: the reference data, the Stringtie annotations and the Trinity mappings.
+We need to download the necessary files: the reference data, the Stringtie annotations and the Trinity mappings.
 People on NREC can use the commands below to download the necessary files to their computer:
 > Remember to open a new terminal which is not connected to NREC, and to replace the parts between curly brackets (`{}`) with your relevant information.
 > You can replace `{target directory}` with `./` if you want to download the files to the folder from which you are running the command.
 > The total download size is +- 275 Mbp
 
 ```
-scp -i {path to private key} '{username}@[{NREC server ip}]:/home/{username}/Practical5/Chr15.fasta' {target directory}
-scp -i {path to private key} '{username}@[{NREC server ip}]:/home/{username}/Practical5/Chr15.gtf' {target directory}
-scp -i {path to private key} '{username}@[{NREC server ip}]:/home/{username}/Practical5/TranscriptMap*.bam' {target directory}
-scp -i {path to private key} '{username}@[{NREC server ip}]:/home/{username}/Practical5/TranscriptMap*.bam.bai' {target directory}
-scp -i {path to private key} '{username}@[{NREC server ip}]:/home/{username}/Practical5/*stringtie.gtf {target directory}
+scp -i {path to private key} '{username}@[{NREC_server_ip}]:/home/{username}/Practical5/Chr15.fasta' {target directory}
+scp -i {path to private key} '{username}@[{NREC_server_ip}]:/home/{username}/Practical5/Chr15.gtf' {target directory}
+scp -i {path to private key} '{username}@[{NREC_server_ip}]:/home/{username}/Practical5/TranscriptMap*.bam' {target directory}
+scp -i {path to private key} '{username}@[{NREC_server_ip}]:/home/{username}/Practical5/TranscriptMap*.bam.bai' {target directory}
+scp -i {path to private key} '{username}@[{NREC_server_ip}]:/home/{username}/Practical5/*stringtie.gtf {target directory}
 ```
 
 Now open IGV. Go to "Genomes" -> "Load genome from file", and load the `Chr15.fasta` file.
 Then, go to "File" -> "Load from file" and load the `Chr15.gtf`, and the 3 stringtie files (`gtf`s).
-Zoom in untill you can properly see the refernece genes (about halfway the zoom bar should be fine).
-Go through the chromosome and compare the reference transcripts, with our assembled transcripts.
+Zoom in until you can properly see the reference genes (about halfway the zoom bar should be fine).
+Go through the chromosome and compare our assembled transcripts to the reference transcripts.
 To get a better overview of the transcripts, right click on every track, and pick the "Squished" mode, to display all transcripts instead of having them overlap.
 >Since the reference track is the widest, you can put it on the bottom of the track list for having a better overview.
 
 <details>
 <summary>Are the predictions good? Which of the three assemblies is the best? If you want to have a good example, go to the "TJP1" gene.</summary>
 
-_The predictions are not great (which we already could gather from the statistics)._
+_The predictions are not great (which we already could gather from GFFcompare)._
 _Some genes are not annotated, and some of the annotations do not match with the reference._
 _The Nanopore predictions are the worst. They are very fragmented, and often don't capture full genes._
 _The PE predictions are quite good, and often match with the reference, but many genes are not covered._
@@ -498,13 +520,14 @@ Remove the stringtie tracks, and load the Trinity mappings instead. Browse the m
 <summary>How do the generated transcripts compare to the reference transcripts?</summary>
 
 _Not all genes are covered, some genes are covered partially, some genes have a nice transcript that covers it._
+_This is normal, as we don't have so many reads here and Trinity normally requires high-coverage data to assemble high-quality transcripts._
 </details>
 
 <details>
 <summary>Are there many differences between PE-only and PE+HiFi trinity assemblies?</summary>
 
 _Not really. The differences are very minor._
-_Since Trinity is optimized for using short reads, if you have already good/enough data, adding long reads will not improve the transcriptome assembly much._
+_It could be that there is not much extra information that the long reads add that is not contained in the short-reads._
 </details>
 
 ## Final remarks
@@ -513,10 +536,36 @@ As you might have experienced from this practical, transcriptome assembly can ge
 The transcriptomes that we assembled in this practical were often of mediocre or low quality.
 There are multiple reasons why this is the case:
 
-- We are only looking at partial data (one chromosome), instead of a whole genome
-- Our long reads have not been properly pre-processed (we only used a quick trimming using cutadapt, which is not designed to deal with long reads)
-- Some of the methods we have used are not optimized or designed with long reads in mind
-- We only used the default settings on the tools we have used
-- Assembling a transcriptome from one read set will never capture the full transcriptome (not all genes are expressed at a certain point)
+- We are only looking at partial data (one chromosome), instead of a whole genome.
+- Our long reads have not been properly pre-processed (we only used a quick trimming using cutadapt, which is not designed to deal with long reads).
+- Some of the methods we have used are not optimized or designed with long reads in mind.
+- We only used the default settings on the tools we have used.
+- Assembling a transcriptome from one read set will never capture the full transcriptome (not all genes are expressed at a certain point).
 
 This practical is mainly to show you about the tools you can use, and to familiarize with some of the output. If you want to read more about transcriptome assembly, a good review can be found [here](https://www.ncbi.nlm.nih.gov/books/NBK569566/).
+
+## Cleanup
+
+Once you have performed all the analyses, it is time to do some cleanup. We will remove some files that we don't need anmyore, and will compress files to save space.
+
+Remove the `.zip` archives that FastQC creates (Once you have the multiqc report, they are not needed anymore):
+```
+rm *zip
+```
+
+Remove the genome indexes, and bam indexes (after you have downloaded them for visualisation):
+```
+rm *index* rm *bai
+```
+
+Compress the filtered reads, reference data, and transcriptomes so they take up less space on the disk:
+```
+gzip *fastq Chr15* HomSap* *gtf
+```
+
+Remove some gffcompare temporary files:
+
+```
+rm *tmap *refmap *loci *tracking
+```
+ 
