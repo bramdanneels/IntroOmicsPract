@@ -1,33 +1,35 @@
 # BINF201 – Practical 6 – Metagenomics
 
-In this practical we will be having a look at metagenomic data. We will perform metagenome assemblies and perform binning to try to recover full genomes.
+In this practical we will have a look at metagenomic data: data containing reads from multiple species.
+We will perform metagenome assemblies and perform binning to try to recover full genomes.
 In addition we will have a look at marker-gene based analysis (e.g. 16S) and how to analyse those.
 
 ## Software installation and data retrieval
 
 In this tutorial, we will have a look at the following metagenomics and related software:
 
-- [MegaHit](https://github.com/voutcn/megahit) - An ultra-fast and memory-efficient (meta-)genome assembler
+- [MetaSPAdes](https://github.com/ablab/spades) - An adaptation of the popular SPAdes assembler for metagenomic data
 - [MetaFlye](https://github.com/mikolmogorov/Flye) - An adaptation of the Flye long-read assembler for metagenomes
 - [Concoct](https://github.com/BinPro/CONCOCT) - An unsupervised binner for metagenomic contigs
-- [Kraken2](https://github.com/DerrickWood/kraken2) - A taxonomic k-mer based taxonomic classifier
+- [Kraken2](https://github.com/DerrickWood/kraken2) - A taxonomic _k_-mer based taxonomic classifier
 - [Metaphlan](https://huttenhower.sph.harvard.edu/metaphlan/) - A metagenomic community profiling tool
 - [CheckM](https://github.com/Ecogenomics/CheckM) - A quality assesment tool for mircrobial genomes
 - [KrakenTools](https://github.com/jenniferlu717/KrakenTools) - Toolkit for anlysing Kraken/Bracken output
 - [Krona](https://github.com/marbl/Krona/releases) - Taxonomy visualisation tool
-- [Bracken](https://github.com/jenniferlu717/Bracken) - Statistical method for species abundance calculation
+- [Bracken](https://github.com/jenniferlu717/Bracken) - Statistical methods for species abundance calculation
 
 ### For students using NREC
 
-The data and software has been setup on the NREC server. Before starting the practical, make sure to activate the correct environment before each part of the tutorial 
-(`QC` for the QC part, `Metagenome` for the metagenome part)
+The data and software has been setup on the NREC server. 
+Before starting the practical, make sure to activate the correct environment before each part of the tutorial 
+(`QC` for the QC part, `Metagenomics` for the metagenomics part)
 
 You can make a copy of the data you will be working on by running this command from your home directory:
 > If your not sure if you are in the home folder, run `cd` or `cd ~` to go to your home directory.
 
 ```
 mkdir -p Practical6
-ln -s /storage/06_Transcriptome/* Practical6/
+ln -s /storage/data/06_Transcriptome/* Practical6/
 ```
 > `mkdir -p` creates a folder called Practical6. The "-p" options tells mkdir to create subdirectories if necessary, and to not give an error if the folder(s) already exist
 > `ln -s` creates what we call a "symbolic link". This creates a small file that just says "Instead of this file, use the file that I'm liking to". 
@@ -43,10 +45,10 @@ See [the intro practical](00_IntroSetup.md) on how to install mamba, and how to 
 To create a new environment including the necessary tools for this practical, run the following command:
 
 ```
-mamba create -n Metagenomics -c bioconda -c conda-forge spades kraken2 krona metaphlan checkm-genome krakentools hclust2 concoct smalt quast bracken flye minimap2 flash2 pylablib
+mamba create -n Metagenomics -c bioconda -c conda-forge spades kraken2 krona metaphlan checkm-genome krakentools concoct bwa-mem2 quast bracken flye minimap2 flash2
 ```
 > This will create a new environment called "Transcriptome" with the necessary tools.
-> The ncbi-datasets-cli will allow us to download our reference genome.
+> We'll use bwa-mem2 and minimap2 for mapping reads, and flash2 for merging paired reads together.
 
 This will print some information to the screen, telling us to do some additional setup:
 
@@ -61,20 +63,43 @@ ktUpdateTaxonomy.sh
 ```
 checkm data setRoot {path to CheckM data}
 ```
-> Check the output on your screen for the exact comment
+> Check the output on your screen for the exact comment.
+> You can also run `checkm -h` to check the root folder that should be set.
 
 - Download necessary kraken2 databases:
 
 ```
-kraken2-build --standard --threads 2 --db KrakenStandardDB
-kraken2-build --SILVA --threads --db KrakenSILVADB
+kraken2-build --special silva --threads 2 --db KrakenSILVADB
 bracken-build -d KrakenSILVADB -t 2 -k 35 -l 300
 ```
->The first database can take up 100Gb of space. If you don't have that kind of space, only download the SILVA one
 
-- Configure Autometa databases: follow the instructions [here](https://autometa.readthedocs.io/en/latest/databases.html).
+- Fix a Concoct bug:
 
-Then, create a new folder (e.g. `Practical6`), go into it (`cd Practical6`), and then download the necessary data, by either:
+There is a bug in concoct, which can be easily fixed by making a small correction in a script.
+The problem is in a script called "validation.py" from the sklearn package.
+To fix the bug, you need to know where your Mamba/Conda envs are located.
+Normally this will be in your home folder, but if this is not the case for you modify the commands below as appropriate.
+First, we need to find the line of the script that contains the bug:
+
+```
+grep -n "feature_names = np\.asarray(X" ~/miniforge3/envs/Metagenomics/lib/python3.10/site-packages/sklearn/utils/validation.py
+```
+
+This will output the line and line number of the bug.
+We can open `nano` on a specific line to fix the bug:
+>Replace the XXXX with the line number you got from the `grep` command.
+
+```
+nano +XXXX ~/miniforge3/envs/metagenomics/lib/python3.10/site-packages/sklearn/utils/validation.py
+```
+
+Then, replace the line `feature_names = np.asarray(X.columns, dtype=object)`
+to `feature_names = np.asarray(X.columns.astype(str), dtype=object)`.
+Save the file by tapping `Ctrl+O`, and quit by tapping `Ctrl+X`.
+This should fix the bug and make Concoct run without problems.
+
+Lastly, create a new folder (e.g. `Practical6`), go into it (`cd Practical6`), and then download the necessary data.
+You can either:
 
 - Download directly from the [Zenodo repository]():
 
@@ -86,13 +111,11 @@ gunzip *gz
 - Download and filter the data manually using the commands below:
 
 > Remember to activate the download environment (see [here](00_IntroSetup.md)).
-> This will download the data, and create subsamples
+> This will download the data, and create subsamples of the read sets.
 > Note: Largest downloaded file: 7G, total size after subsampling: 7.5G
 
-> Important: Part of the data-prep is mapping the reads to Chr15. It is not recommended to do this on a normal desktop computer.
-> Running the commands as they are written (i.e. with only 2 cores) might take multiple hours to complete the mappings!
-> If you don't have access to high-performance computing resources, we highly recommend downloading the prepared files from Zenodo (see above)
-
+<details>
+<summary>Click here to expand the command necessary for setting up the data yourself</summary>
 ```
 prefetch SRR27874410
 fasterq-dump -p --outdir ./ --split-files SRR27874410/SRR27874410.sra
@@ -129,10 +152,11 @@ fasterq-dump -p --outdir ./ --split-files ERR12117715/ERR12117715.sra
 seqtk sample -s666 ERR12117715.fastq 75000 > Sea_HiFi.fastq
 rm -r ERR12117715*
 ```
+</details>
 
 ## The Data
 
-The data for this tutorial are different kinds of metagenomes:
+The data we will use in this tutorial are different kinds of metagenomes:
 
 - A plant metagenome (short paired-end reads)
 - A stool (faeces) metagenome (short paired-end reads)
@@ -140,16 +164,20 @@ The data for this tutorial are different kinds of metagenomes:
 - Three soil metagenomes (16S amplicon sequencing, paired Illumina reads)
 
 Most samples have been downsampled to speed up their analysis.
-For an overview of where the data comes from, see the [information sheet on Zenodo]().
+For an overview of the data used in this practical, please see the [information sheet on Zenodo]().
 
 ## Shotgun metagenomics
 
-In this first part, we will have a look at the shotgun metagenomics data. This data is generated by sequencing all DNA from a sample. We have two short-read samples, and one long-read one.
+In this first part, we will have a look at the shotgun metagenomics data. 
+This data is generated by sequencing all DNA from a sample. 
+We have two short-read samples (Plant & Stool), and one long-read one (Sea).
 
 ### Quality control
 
-As is usual, we'll start by performing quality control of our sequences. Run FastQC on the Plant, Stool, and Sea samples, and have a look at the QC reports.
-> Remember to activate the QC environment!
+As usual, we'll start by performing quality control of our sequences.
+Since our read sets are a bit larger in size, FastQC would take a while to run on NREC.
+We have thus provided the FastQC reports with the data on NREC.
+Have a look at the QC reports.
 
 <details>
 <summary>Do we need any trimming?</summary>
@@ -164,7 +192,8 @@ _Because we are dealing with metagenome samples: the samples contain DNA from mu
 </details>
 
 We will do some basic trimming using cutadapt to get rid of low-quality bases and adapters in the short reads:
-> We will override our read files with the trimmed versions. If for some reason you need the original reads again, rerun the link command at the beginning of the tutorial.
+> We will override our read files with the trimmed versions. 
+> If for some reason you need the original reads again, rerun the link command at the beginning of the tutorial.
 
 ```
 cutadapt -q 30,30 -m 30 -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT -o tempF.fq -p tempR.fq Plant_F.fastq Plant_R.fastq
@@ -177,17 +206,20 @@ mv tempR.fq Stool_R.fastq
 
 ### Taxonomic profiling of reads
 
-Now that we have QC’ed and filtered our reads, we could try a first classification on read level. 
+Now that we have QC’ed and filtered our reads we can try a first classification on read level.
 We will first use [kraken2](https://ccb.jhu.edu/software/kraken2/) for this. 
-Kraken extracts k-mers from our reads and compares them to a database to classify them. We will first concatenate our paired-end reads from one sample together:
-> Here we will classify the trimmed reads. It is however debated wether it is better to classify trimmed or raw reads. Raw reads are more representative, but can lead to some errors due to low-quality bases.
+Kraken extracts _k_-mers from our reads and compares them to a database to classify them. 
+We will first concatenate the paired-end reads from each sample together:
+> Here we will classify the trimmed reads. 
+> It is however debated wether it is better to classify trimmed or raw reads. 
+> Raw reads are more representative, but can lead to some errors due to low-quality bases.
 
 ```
 cat Plant_F.fastq Plant_F.fastq > Plant_all.fastq
 cat Stool_R.fastq Stool_R.fastq > Stool_all.fastq
 ```
 
-Then we will Kraken, using a 16S database from [SILVA](https://www.arb-silva.de/):
+Then we will run Kraken2, using a 16S database from [SILVA](https://www.arb-silva.de/):
 
 ```
 kraken2 --db /storage/dbs/KrakenSILVADB/ --threads 2 --output Plant.kraken.out --report Plant.kraken.report Plant_all.fastq
@@ -200,10 +232,12 @@ Take a look at the generated reports:
 ```
 less *report
 ```
-> This will open all files endin in "report" using the `less` command. To switch between files, you can press `:n` for next file, or `:p` for previous file.
+> This will open all 3 files ending in "report" using the `less` command. 
+To switch between files, you can press `:n` for next file, or `:p` for previous file.
 
-In the first column, we can see what proportion is classified as a certain taxonomy (last column). However, this overview is quite long and complex.
-We'll use krakentools and kronatools to make a visual overview.:
+In the first column, we can see the proportion of reads that is classified as a certain taxonomy (the last column). 
+However, this overview is quite long and complex and difficult to interpret as a human.
+We will use krakentools and kronatools to make a visual overview of the taxonomic distribution in our samples:
 
 ```
 kreport2krona.py -r Plant.kraken.report -o Plant.krona
@@ -213,31 +247,34 @@ ktImportText Stool.krona -o Stool.krona.html
 kreport2krona.py -r Sea.kraken.report -o Sea.krona
 ktImportText Sea.krona -o Sea.krona.html
 ```
-> `kreport2krona.py` will conver the kraken output to an output that Kronatools can read
-> `ktImportText` will transform the modified output to a krona plot
+> `kreport2krona.py` will convert the kraken output to an output that Kronatools can read.
+> `ktImportText` will transform the modified output to a krona plot.
 
-Now download and look at the generated .html files. You will probably see that most of the plot is unclassified reads.
-This is because we are only classifying using a 16S database. 
+Now download and look at the generated `.html` files. 
+You will probably see that most of the plot is unclassified reads.
+This is because we are only classifying the reads using a 16S database. 
 16S is only one of the many genes in bacteria so if we sequence all the DNA from a sample, only few reads will be part of the 16S.
 
-Try double clicking on the "Bacteria" section, in the bottom right corner
+Try double clicking on the "Bacteria" section, in the bottom right corner.
+This will only show the reads classified as bacterial, and give the taxonmic distribution inside that part.
 
 <details>
 <summary>What is the most abundant group in each sample?</summary>
 
-_Plant: Actinobacteriota-Streptomyces_
+- _Plant: Actinobacteriota-Streptomyces_
+- _Stool: Actinobacteriota-Bifidobacterium_
+- _Sea: Proteobacteria-Klebsiella_
 
-_Stool: Actinobacteriota-Bifidobacterium_
-
-_Sea: Proteobacteria-Klebsiella_
 </details>
 
-Look a bit at the different report. You can "zoom in" on certain slices by double clicking, and return to levels above using the circles in the top right.
+Look a bit at the different reports. 
+You can "zoom in" on certain slices by double clicking, and return to levels above using the circles in the top right.
 
-In a real analysis, you would not perform this analysis on a database of 16S sequences, but on a database containing full genomes. 
-However, as these databases can easily take up >100 Gb it is not possible to perform these as part of the practical. 
-However, in your data folder we have provided you with the results of the Kraken output on a larger database containing full genome sequences. 
-Take a look at the `Plant.full.krona.html`, `Stool.full.krona.html`, and `Sea.full.krona.html` files.
+In a real example, you would not perform this analysis on a database of 16S sequences but on a database containing full genomes.
+Kraken2 has such a database, but it takes up >100Gb of space which is too much for this tutorial.
+However, in your data folder we have provided you with the results of the Kraken2 output this larger database containing full genome sequences. 
+Download and take a look at the `Plant.full.krona.html`, `Stool.full.krona.html`, and `Sea.full.krona.html` files.
+> If you don't like downloading the files from NREC to your personal computer, you can download the relevant files directly from [Zenodo]().
 
 <details>
 <summary>What is the most common species in each sample?</summary>
@@ -251,14 +288,14 @@ Take a look at the `Plant.full.krona.html`, `Stool.full.krona.html`, and `Sea.fu
 <summary>Are there a lot of eukaryotic reads in the sample? If so, from which species?</summary>
 
 - _Plant: almost none, the few that are there are from a Poaceae species_
-- _Stool: almost none, the few that are there are from different plant species mainly_
+- _Stool: almost none, the few that are there are from different plant species_
 - _Sea: a significant part: 11%. Mostly different plant species as well_
 </details>
 
 <details>
 <summary>How diverse are the samples? Which sample looks to be the most diverse?</summary>
 
-_The plant species is not diverse at all, the stool sample has some more species, but the sea sample is very diverse._
+_The plant sample is not diverse at all, the stool sample has some more species, but the sea sample is very diverse._
 </details>
 
 Kraken can give a good overview of the diversity, and since it’s read based also of the abundance of each species in the sample.
@@ -266,7 +303,7 @@ Kraken can give a good overview of the diversity, and since it’s read based al
 
 Another neat tool for taxonomic profiling and quantification, is [Metaphlan](https://huttenhower.sph.harvard.edu/metaphlan).
 Metaphlan will map the reads to a database of marker genes (genes typical for certain clades/species).
-Since the Metaphlan database is quite large (>20Gb), and the software can be quite slow, we will have provided the output in the data for this tutorial.
+Since the Metaphlan database is quite large (>20Gb), and the software can be quite slow, we have provided the output in the data for this tutorial.
 
 > If you want to run these yourself, you can use following commands:
 >```
@@ -275,15 +312,16 @@ Since the Metaphlan database is quite large (>20Gb), and the software can be qui
 >metaphlan Sea_HiFi.fastq --nproc 2 --input_type fastq --unclassified_estimation --index /storage/dbs/Metaphlan -o Sea_metaphlan
 >```
 
-Take a look at the provided files: `Plant.metaphlan.txt`, `Stool.metaphlan.txt`, and `Sea.metaphlan.txt` files (e.g. using `cat` or `less`).
-As you can see, these files are not straightforward to interpret. We can get a rough estimation of the number of identified species using `grep`:
+Take a look at the provided files: `Plant.metaphlan.txt`, `Stool.metaphlan.txt`, and `Sea.metaphlan.txt` (e.g. using `cat` or `less`).
+As you can see, these files are not straightforward to interpret. 
+We can get a rough estimation of the number of identified species using `grep`:
 
 ```
 grep "s__" Plant.metaphlan.txt | grep -v "t__" | wc -l
 grep "s__" Stool.metaphlan.txt | grep -v "t__" | wc -l
 grep "s__" Sea.metaphlan.txt | grep -v "t__" | wc -l
 ```
-> Here we select all lines wich have "s__" in them (= identified at species level), and then filter everything out that is classified at the strain level ("t__")
+> Here we select all lines wich have "s__" in them (= identified at species level), and then filter everything out that is classified at the strain level ("t__").
 
 <details>
 <summary>How many different species are identified in each sample?</summary>
@@ -296,20 +334,22 @@ _None in the sea sample, 1 in the plant sample, 36 in the stool sample._
 <summary>Are these results in line with the Kraken results?</summary>
 
 _More or less. We found only one main species in the plant sample and a bit more specis in the stool sample._
-_We can't comment on the sea sample, since it seems to have failed._
+_We can't comment on the sea sample, since the metaphlan analysis seems to have failed._
 </details>
 
-Metaphlan can also do some extra analysis on metagenomic samples, of which we will use some in the amplicon analysis.
+Metaphlan can also do some extra analysis on metagenomic samples.
 See the [Metaphlan](https://huttenhower.sph.harvard.edu/metaphlan) page for a full overview of all functionalities.
 
 ###  Metagenome assembly
 
-So we made a taxonomic profile of the reads, and have a good idea of what is in there. 
+We made a taxonomic profile of the reads, and have a good idea of what is in there. 
 However, for a more functional analysis it would be good to also have the genomes of some of these species. 
 To get to these, we will first do a metagenome assembly using metaSPAdes for the short reads, and MetaFlye for the long reads.
-In metagenome assembly we're just creating contigs from the reads. This works similar to a normal genome assemblies, but takes into account that multiple species are present (and thus multilpe DBGgraphs will be formed).
-Metagenome assembly is a bit more resource intensive on short reads. Using the quick and efficient [MegaHit](https://github.com/voutcn/megahit) assembler, the assemblies would still take 15m each on 2 cores, and 30m with spades (1h if error-correction is performed).
-To save you some time, the metaSPAdes assemblies have been run beforehand, and the resulting assembly and assembly graph have been provided (`Plant_meta.fasta`, `Stool_meta.fasta`, `Plant_meta.gfa`, `Stool_meta.gfa`)
+In metagenome assembly we're just creating contigs from the reads. 
+This works similar to a normal genome assemblies, but takes into account that multiple species are present (and thus multilpe DBGgraphs will be formed).
+Metagenome assembly is a bit more resource intensive on short reads. 
+Using the quick and efficient [MegaHit](https://github.com/voutcn/megahit) assembler, the assemblies would still take 15m each on 2 cores, and they would take 30m with spades (1h if error-correction is performed).
+To save you some time, the metaSPAdes assemblies have been run beforehand, and the resulting assembly and assembly graph have been provided (`Plant_meta.fasta`, `Stool_meta.fasta`, `Plant_meta.gfa`, `Stool_meta.gfa`).
 For your information, the commands used for running the assemblies can be found below:
 
 >```
@@ -317,17 +357,19 @@ For your information, the commands used for running the assemblies can be found 
 >metaspades.py -t 2 -1 Stool_F.fastq -2 Stool_R.fastq -o Stool_metaspades
 >```
 
-The reason we provided the assembly graphs (`.gfa`) is because we want to take a look at it.
+The reason we provided the assembly graphs (`.gfa`) is because we want to take a look at them.
 A good tool to visualise the structure of our assembly graphs is [Bandage](http://rrwick.github.io/Bandage/). 
-Install the software, and then download the `assembly_graph.fastg` from both assemblies (you might have to rename to avoid overwriting them when downloading). 
-Start the Bandage software, and open the `.gfa` files of both assemblies. Once opened, click on the “draw graph” button to drawh the bandage graph.
-You can draw a frame over a collection of lines, and see how long they are on the right side of the screen.
+Install the software, and then download the `assembly_graph.fastg` from both assemblies (you might have to rename to avoid overwriting them when downloading).
+> Again, you can download the `.fastg` files directly from [Zenodo]() if you prefer. 
+Start the Bandage software, and open the `.gfa` files of both assemblies. 
+Once opened, click on the “draw graph” button to draw the bandage graph.
+You can draw a frame over a collection of lines (contigs), and see their total length on the right side of the screen.
 
 <details>
 <summary>How many large clusters do you see? What do they correspond to according to you?</summary>
 
-_Stool sample: There is one big connected cluster (total size +- 14 Mbp). This is likely one bacterial genome (or two closely related). Otheriwse we have smaller components (100kb and lower). These are likely contigs from different other species which are present in lower amounts in the sample._
-_Plant sample: There is also one big connected cluster (total size +- 9Mbp). Again, this is likely one bacterial genomes. The other components are similar, but there are less short pieces in this sample._
+- _Stool sample: There is one big connected cluster (total size +- 14 Mbp). This is likely one bacterial genome (or two closely related).Otheriwse we have smaller components (100kb and lower). These are likely contigs from different other species which are present in lower amounts in the sample._
+- _Plant sample: There is also one big connected cluster (total size +- 9Mbp). Again, this is likely one bacterial genomes. The other components are similar, but there are less short pieces in this sample._
 </details>
 
 Now let's assemble the long reads, using the metagenomic mode of Flye:
@@ -346,7 +388,8 @@ _We have a lot fewer components, and all components are one contig and non-conne
 
 ### Metagenome binning
 
-We now have our metagenome: a collection of contigs. However, we have no idea which contigs belongs to which species/genome.
+We now have our metagenome: a collection of contigs. 
+However, we have no idea which contigs belongs to which species/genome.
 So, we need to try to separate contigs from different genomes into so-called genome bins.
 Here we will use Concoct for binning, but other good binning tools are [Autometa](https://autometa.readthedocs.io/en/latest/index.html) or [MetaBat](https://bitbucket.org/berkeleylab/metabat).
 We will first create a new directory for binning and put our metagenome assemblies there.
@@ -359,24 +402,24 @@ ln -s ${PWD}/Sea_metaFlye/assembly.fasta binning/Sea_meta.fasta
 cd binning
 ```
 
-One type of information that can help bin genomes is coverage.
-We expect different genomes to have different coverages, or better stated we expected contigs coming from the same genome to have simlar covarage.
+One type of information that can help separate genomes into bins is genomic coverage coverage.
+We expect different genomes to have different coverages, in other words we expected contigs coming from the same genome to have simlar coverage.
 To get coverage information, we’ll have to map the reads to the metagenome. 
-We’ll be using Smalt for mapping the short reads, and Minimap2 for mapping the long reads:
+We’ll be using Bwa-mem2 for mapping the short reads, and Minimap2 for mapping the long reads:
 
 ```
-smalt index -k 11 -s 4 PMindex Plant_meta.fasta
-smalt index -k 11 -s 4 SMindex Stool_meta.fasta
+bwa-mem2 index -p PMindex Plant_meta.fasta
+bwa-mem2 index -p SMindex Stool_meta.fasta
 mkdir mapping
-smalt map -n 2 PMindex ../Plant_F.fastq ../Plant_R.fastq | samtools view -bS | samtools sort > mapping/Plant.bam
-smalt map -n 2 SMindex ../Stool_F.fastq ../Stool_R.fastq | samtools view -bS | samtools sort > mapping/Stool.bam
+bwa-mem2 map -t 2 PMindex ../Plant_F.fastq ../Plant_R.fastq | samtools view -bS | samtools sort > mapping/Plant.bam
+bwa-mem2 map -t 2 SMindex ../Stool_F.fastq ../Stool_R.fastq | samtools view -bS | samtools sort > mapping/Stool.bam
 minimap2 -t 2 -ax map-hifi Sea_meta.fasta ../Sea_HiFi.fastq | samtools view -bS | samtools sort > mapping/Sea.bam
 samtools index mapping/Plant.bam
 samtools index mapping/Stool.bam
 samtools index mapping/Sea.bam
 ```
 
-To increase binning performance, Concoct wants us to cut up our contigs in similarly-sized pieces. We’ll do this by running:
+To increase binning performance, Concoct wants us to cut up our contigs in equally-sized pieces. We’ll do this by running:
 
 ```
 cut_up_fasta.py Plant_meta.fasta -c 10000 -o 0 --merge_last -b Plant_10k.bed > Plant_10k.fa
@@ -393,15 +436,16 @@ concoct_coverage_table.py Stool_10k.bed mapping/Stool.bam > Stool_cov.tsv
 concoct_coverage_table.py Sea_10k.bed mapping/Sea.bam > Sea_cov.tsv
 ```
 
-Then we can run concoct itself:
+Then we can run concoct itself to identify the different bins:
 
 ```
 concoct --threads 2 --composition_file Plant_10k.fa --coverage_file Plant_cov.tsv -b Plant_binning
 concoct --threads 2 --composition_file Stool_10k.fa --coverage_file Stool_cov.tsv -b Stool_binning
 concoct --threads 2 --composition_file Sea_10k.fa --coverage_file Sea_cov.tsv -b Sea_binning
 ```
+>This might print a lot of warnings for the first command, but you can ignore them.
 
-However, now we only clustered the cut-up pieces of our assembly. So, we need to get back to the original contigs:
+However, we only clustered the cut-up pieces of our assembly. We need to get back to the original contigs:
 
 ```
 merge_cutup_clustering.py Plant_binning_clustering_gt1000.csv > Plant_binning_clustering_merged.csv
@@ -420,8 +464,9 @@ extract_fasta_bins.py Sea_meta.fasta Sea_binning_clustering_merged.csv --output_
 
 ### Binning QC
 
-We now have genomic bins for each sample. A genomic bin is a set of contigs that is believed to come from the same genome. 
-We can thus treat it as a genome, and use genome QC tools to assess their quality.
+We now have genomic bins for each sample. 
+A genomic bin is a set of contigs that is assumed to come from the same genome/species. 
+We can thus treat it as a genome and use genome QC tools to assess their quality.
 We can quickly have an overview of the genome statistics using Quast:
 
 ```
@@ -449,63 +494,133 @@ _There was a lot of diversity in the sea sample, but it looks like we did not ge
 </details>
 
 <details>
-<summary>Why do you think we could not recover all species' genomes?</summary>
+<summary>Why do you think we could not recover the genomes of all?</summary>
 
-_Mainly because we are lacking coverage (we only worked on a subset of reads), so we have not enough information to recover all genomes._
-_Especially species which are present in low amounts are difficult to recover from metagenomic samples._
+_Mainly because we are lacking coverage (especially since we only worked on a subset of reads), so we have not enough information to recover all genomes._
+_Species which are present in low abundance are difficult to recover from metagenomic samples._
 </details>
 
 Lastly, we will be using [CheckM](https://github.com/Ecogenomics/CheckM/wiki) to check how good the bins are that we reconstructed. 
 This software will try to identify marker genes in our bins, and use that to estimate the completeness, purity (~ 1-contamination), and tries to classify our bin.
+Running CheckM takes a wile, and requires some memory (40G, or 14G when running in a less accurate low-memory mode (`--reduced_tree`)).
+We have provided the relevant output below, so you don't have to run the relevant commands.
 
 ```
-checkm lineage_wf Plant_bins/ Plant_checkm -x .fa -t 2 --reduced_tree
-checkm lineage_wf Stool_bins/ Stool_checkm -x .fa -t 2 --reduced_tree
-checkm lineage_wf Sea_bins/ Sea_checkm -x .fa -t 2 --reduced_tree
+checkm lineage_wf Plant_bins/ Plant_checkm -x .fa -t 2
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Bin Id           Marker lineage           # genomes   # markers   # marker sets   0     1    2   3   4   5+   Completeness   Contamination   Strain heterogeneity
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  1        f__Streptomycetaceae (UID2048)       60         460           233        2    452   6   0   0   0       99.46            0.93               0.00
+  9                 root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+  8                 root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+  7                 root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+  6                 root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+  5                 root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+  4                 root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+  3                 root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+  2                 root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+  12                root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+  11                root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+  10                root (UID1)                5656         56            24        56    0    0   0   0   0        0.00            0.00               0.00
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+checkm lineage_wf Stool_bins/ Stool_checkm -x .fa -t 2
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Bin Id            Marker lineage           # genomes   # markers   # marker sets    0     1     2     3    4   5+   Completeness   Contamination   Strain heterogeneity
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  1        f__Bifidobacteriaceae (UID1462)       65         476           217         1    474    1     0    0   0       99.54            0.12               0.00
+  11          o__Bacteroidales (UID2657)        160         492           269         32    34   309   109   8   0       98.83           122.37             38.30
+  3              k__Bacteria (UID203)           5449        104            58         19    46    28    11   0   0       79.69           24.87              67.21
+  10          o__Clostridiales (UID1226)        155         278           158        106   147    23    2    0   0       61.89            7.14              20.69
+  27         o__Selenomonadales (UID1024)        64         334           167        146   183    5     0    0   0       55.96            1.80              20.00
+  22             k__Bacteria (UID203)           5449        104            58         67    37    0     0    0   0       55.52            0.00               0.00
+  2           o__Clostridiales (UID1212)        172         261           147        103   135    23    0    0   0       53.36            5.55               4.35
+  23          o__Clostridiales (UID1226)        155         278           158        169    83    24    2    0   0       37.13            9.24              10.00
+  6        f__Enterobacteriaceae (UID5124)      134         1173          336        732   429    12    0    0   0       35.15            0.28              16.67
+  4              k__Bacteria (UID203)           5449        103            57         90    13    0     0    0   0        5.58            0.00               0.00
+  0              k__Bacteria (UID203)           5449        103            58         99    4     0     0    0   0        2.04            0.00               0.00
+  9                  root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  8                  root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  7                  root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  5                  root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  28                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  26                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  25                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  24                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  21                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  20                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  19                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  18                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  17                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  16                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  15                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  14                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  13                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+  12                 root (UID1)                5656         56            24         56    0     0     0    0   0        0.00            0.00               0.00
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+checkm lineage_wf Sea_bins/ Sea_checkm -x .fa -t 2
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Bin Id            Marker lineage            # genomes   # markers   # marker sets    0     1    2    3   4    5+   Completeness   Contamination   Strain heterogeneity
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  7              k__Bacteria (UID203)            5449        104            58         23    53   13   5   10   0       63.79           18.65              22.73
+  5              k__Bacteria (UID203)            5449        104            58         32    55   16   0   1    0       57.29           15.37              63.64
+  15        o__Rhodospirillales (UID3754)         63         336           201        166   143   25   2   0    0       50.60            7.91               3.77
+  11             k__Bacteria (UID203)            5449        104            58         67    28   9    0   0    0       34.48            2.82               0.00
+  13             k__Bacteria (UID203)            5449        104            58         85    19   0    0   0    0       27.59            0.00               0.00
+  6              k__Bacteria (UID203)            5449        104            58         87    17   0    0   0    0       22.02            0.00               0.00
+  1        c__Gammaproteobacteria (UID4443)      356         451           270        364    85   2    0   0    0       10.15            0.08               0.00
+  8                  root (UID1)                 5656         56            24         55    1    0    0   0    0        4.17            0.00               0.00
+  2                  root (UID1)                 5656         56            24         55    1    0    0   0    0        4.17            0.00               0.00
+  14             k__Bacteria (UID203)            5449        102            56         97    5    0    0   0    0        3.90            0.00               0.00
+  4              k__Bacteria (UID203)            5449        102            56        100    2    0    0   0    0        1.79            0.00               0.00
+  9                  root (UID1)                 5656         56            24         56    0    0    0   0    0        0.00            0.00               0.00
+  3                  root (UID1)                 5656         56            24         56    0    0    0   0    0        0.00            0.00               0.00
+  12                 root (UID1)                 5656         56            24         56    0    0    0   0    0        0.00            0.00               0.00
+  10                 root (UID1)                 5656         56            24         56    0    0    0   0    0        0.00            0.00               0.00
+  0                  root (UID1)                 5656         56            24         56    0    0    0   0    0        0.00            0.00               0.00
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 > We tell CheckM to analyze files ending in `.fa` (`-x .fa`), using two threads (`-t 2`). 
-> We also added the `--reduced_tree` option to lower the memory requirements (14G instead of 40G for the full tree). 
-> This however slightly lowers the accuracy of the analysis.
-
-Normally, the analyses will have printed the overview table to the screen. Have a look at them.
 
 <details>
-<summary>How many good quality genomes are recovered from the data?</summary>
+<summary>How many good quality genomes are recovered from the data based on the CheckM output?</summary>
 
 - _Plant: 1 high-quality genome part of the Streptomycetaceae family. The other bins show no markers._
 - _Stool: Many genomes are discovered. 1 high-quality (Bifidobacteriaceae), 1 near-complete but possibly contaminated (or 2 close strains; Bacteroidales), some half-complete genomes (50-80% completeness), and the rest is likely nothing._
-- _Sea: There are some genomes detected, but none are fully complete. Most of them are also difficult to classify._
+- _Sea: There are some genomes detected, but none are fully complete. Most of them are also difficult to classify (classified only as Bacteria)._
 </details>
 
 <details>
-<summary>How is the quality of the bins? Do you think we could have recovered more genomes if we would have used the full dataset instead ofa subsample of reads?</summary>
+<summary>Do you think we could have recovered more genomes if we would have used the full dataset instead ofa subsample of reads?</summary>
 
-_We could discover some high-quality bins in Plant and Stool._
-_In the plant sample, it looks like there is only one species really present._
-_In the stool sample, there are more genomes present, and having the full dataset could have helped us recover more complete genomes._
-_In the sea sample, we didn't manage to recover a high-quality genome, but could detect some uncomplete genomes. Using all data could help complete some of them._
+_Using the full data, we might be able to discover more high-quality bins in some samples:_
+
+- _In the plant sample, it looks like there is only one species really present, and we managed to recover its genome._
+- _In the stool sample, there are more genomes present, and having the full dataset could have helped us recover more complete genomes._
+- _In the sea sample, we didn't manage to recover a high-quality genome, but could detect some uncomplete genomes. Using all data could help complete some of them._
 </details>
 
 As a last note: binning analysis on long reads is not always recommended. 
 Most binning tools use coverage as an important factor to cluster contigs together.
 Since long reads tend to have fewer reads, and thus lower coverages, it is not always easy/possible to cluster contigs together using coverage.
-If enough coverage is available, a meteagenome assembly alone could be sufficient to recover the full genomes of separate species.
+If enough coverage is available, a meteagenome assembly alone could also be sufficient to recover the full genomes of separate species instead of going through a binning step.
+> If you are interested in long-read metagenome assembly, you can find a nice review [here](https://translational-medicine.biomedcentral.com/articles/10.1186/s12967-024-04917-1).
 
 ##  Amplicon sequencing data
 
 In the previous part we have used whole metagenome sequencing data to recover genomes of some of the members of the bacterial communities.
 We have not looked at the exact community structure and diversity. 
 In this part we will look at amplicion sequencing data (only the 16S gene is sequenced, instead of all the DNA in the sample), and how we can use it to compare microbial communities.
-The analysis presented here for comparing the communities an also used on shotgun sequencing data, so have a look at their documentation if you want to do that.
+The analysis presented here for comparing the communities can also be used on shotgun sequencing data. 
+However, this would require using the larger Kraken2 database to be able to classify most of the reads.
 
-Because of time restraints, we have only looked at shotgun metagenome analysis. 
-If you are interested in analyzing some amplicon data, here are some small exercises here regarding taxonomic profiling and comparing samples using Kraken, Bracken, and Metaphlan. 
-If you want to have an overview of metagenomic tools, here is a good review: [https://link.springer.com/article/10.1007/s13238-020-00724-8](https://link.springer.com/article/10.1007/s13238-020-00724-8)
-
-We will analyze three sets of 16S amplicon sequencing data from soil metagenomes. 
+We will analyze three sets of 16S amplicon sequencing data from soil metagenomes.
 You can find them in the same data folder as the other data we used, and are named Soil_1, Soil_2, and Soil_3.
 
-First, run `fastqc` on the three sets of reads and have a look at the reports.
+First, run have a look at the FastQC reports that we provided for the read sets.
+> If you are not on NREC you have to run the fastqc commands yourself.
+> Remember to go back to the main Pract6 folder.
 
 <details>
 <summary>Why do we observe such a high level of duplication in the data?</summary>
@@ -532,32 +647,34 @@ mv tempR.fq Soil_3R.fastq
 ```
 
 Since we sequenced PCR-fragments (amplicons), in many cases the insert size (size of the amplicon) will be shorter than 2x read length.
-This means there will often be overlap between the read pairs. We'll be using [FLASH](https://github.com/dstreett/FLASH2) to merge the reads:
-> It is debated wether it is best to merge first or do trimming first. Here we pick trimming first since the quality dropped quite low sometimes near the end of the reads.
-> Doing merging first might be advisable if you have low amount of reads and want to keep as many as possible.
+This means there will often be overlap between the read pairs. We will use [FLASH](https://github.com/dstreett/FLASH2) to merge the reads of the same pair together.
+Remember to reactivate the Metagenmics environment first!
+> It is debated wether it is best to merge reads first or do read trimming first. 
+> Here we pick trimming first since the quality dropped quite low near the end of the reads.
+> Doing merging first might be better if you have low amount of reads and want to keep as many as possible.
 
 ```
-flash2 Soil_1F.fastq Soil_1R.fastq -M 200
+flash2 Soil_1F.fastq Soil_1R.fastq -M 250
 mv out.extendedFrags.fastq Soil_1M.fastq
 mv out.notCombined_1.fastq Soil_1F.fastq
 mv out.notCombined_2.fastq Soil_1R.fastq
 
-flash2 Soil_2F.fastq Soil_2R.fastq -M 200
+flash2 Soil_2F.fastq Soil_2R.fastq -M 250
 mv out.extendedFrags.fastq Soil_2M.fastq
 mv out.notCombined_1.fastq Soil_2F.fastq
 mv out.notCombined_2.fastq Soil_2R.fastq
 
-flash2 Soil_3F.fastq Soil_3R.fastq -M 200
+flash2 Soil_3F.fastq Soil_3R.fastq -M 250
 mv out.extendedFrags.fastq Soil_3M.fastq
 mv out.notCombined_1.fastq Soil_3F.fastq
 mv out.notCombined_2.fastq Soil_3R.fastq
 ```
 > The `-M` parameter increases the maximal allowed overlap, since we're dealing with relatively long reads (250bp)
 
-Mergeing reads can also be performed to improve genome assembly, as longer reads will make assembly easier.
+Merging reads can also be used to improve genome assembly, as longer reads will make assembly easier.
 As an additional bonus, it will lower the number of total reads, leading to shorter running times.
 
-Let's analyse our soil samples with Kraken first. 
+Let's analyse our soil samples with Kraken2 first.
 We have to again put all reads in one file:
 
 ```
@@ -566,7 +683,7 @@ cat Soil_2*.fastq > Soil_2A.fastq
 cat Soil_3*.fastq > Soil_3A.fastq
 ```
 
-As we are dealing with 16S data, using the SILVA database should give better results then then we were working with shotgun data.
+Since we are dealing with 16S data, using the SILVA database should give better results then when we were working with shotgun data.
 
 ```
 kraken2 --db /storage/dbs/KrakenSILVADB/ --threads 2 --output Soil_1.kraken.out --report Soil_1.kraken.report Soil_1A.fastq
@@ -574,8 +691,8 @@ kraken2 --db /storage/dbs/KrakenSILVADB/ --threads 2 --output Soil_2.kraken.out 
 kraken2 --db /storage/dbs/KrakenSILVADB/ --threads 2 --output Soil_3.kraken.out --report Soil_3.kraken.report Soil_3A.fastq
 ```
 
-We’ll again visualize the results in a krona plot:
-> An alternative way to visualise the kraken reports, is on the webserver [Pavian](https://fbreitwieser.shinyapps.io/pavian/)
+We will again visualise the results in a krona plot:
+> An alternative way to visualise the kraken reports, is on the webserver [Pavian](https://fbreitwieser.shinyapps.io/pavian/).
 
 ```
 kreport2krona.py -r Soil_1.kraken.report -o Soil_1.krona && ktImportText Soil_1.krona -o Soil_1.krona.html
@@ -592,23 +709,25 @@ _All 3 samples look very divers, with not really a single species dominating the
 </details>
 
 <details>
-<summary>Do the 3 samples have similar species distribution on first glance?</summary>
+<summary>Do the 3 samples have similar species distributions on first glance?</summary>
 
 _Soil1 and Soil2 have very similar distributions, Soil3 has the same large groups, but the proportions are a bit different._
 </details>
 
 Now we’ll use a tool called [Bracken](https://ccb.jhu.edu/software/bracken/) to calculate species abundance for all three samples based on the Kraken results.
-Bracken re-estimates the read counts from kraken, to make the more robust and comparable between samples. 
+Bracken re-estimates the read counts from kraken, to make the counts more robust and comparable between samples. 
 Since the SILVA database only classifies on genus level, we will do the analysis on genes level. 
-Furthermore, we will limit ourselves to species with at least 10 reads:
+Furthermore, we will limit ourselves to species with at least 10 reads assigned to them:
 
 ```
-bracken -d /storage/dbs/KrakenSILVADB/ -i Soil_1.kraken.report -o Soil_1.bracken -r 300 -l "G" -t 10
-bracken -d /storage/dbs/KrakenSILVADB/ -i Soil_2.kraken.report -o Soil_2.bracken -r 300 -l "G" -t 10
-bracken -d /storage/dbs/KrakenSILVADB/ -i Soil_3.kraken.report -o Soil_3.bracken -r 300 -l "G" -t 10
+bracken -d /storage/dbs/KrakenSILVADB/ -i Soil_1.kraken.report -o Soil_1.bracken -w Soil_1.bracken.kreport -r 300 -l "G" -t 10
+bracken -d /storage/dbs/KrakenSILVADB/ -i Soil_2.kraken.report -o Soil_2.bracken -w Soil_2.bracken.kreport -r 300 -l "G" -t 10
+bracken -d /storage/dbs/KrakenSILVADB/ -i Soil_3.kraken.report -o Soil_3.bracken -w Soil_3.bracken.kreport -r 300 -l "G" -t 10
 ```
-> We specify the average read length (`-l 300`), and specify we want to classify on Genus level (`-l "G"`). `-t 10` filters out results with fewer than 10 mapped reads.
+> We specify the average read length (`-l 300`), and specify we want to classify on Genus level (`-l "G"`). 
 > We use a read length of 300 since most of our merged reads are that length (= size of the amplicon).
+> `-t 10` filters out results with fewer than 10 mapped reads.
+> The `-o` and `-w` options determine the output files (bracken, and kraken-like output).
 
 Have a look at the Bracken files (using `less`, `head`, or `cat`).
 You will see for every discovered genus the assigned reads, added reads (from higher/lower-level taxonomies), and the new amounts of reads.
@@ -621,18 +740,18 @@ sort -nrk6 Soil_2.bracken | head -n10
 sort -nrk6 Soil_3.bracken | head -n10
 ```
 > We sort numerically (`-n`), in reverse order (`-r`), and use field 6 (corrected reads) (`k6`) to sort.
-> Then, we take the first 10 lines using head.
+> Then, we take the first 10 lines using the `head`.
 
 <details>
-<summary>What is the most abundant genus in each sample?</summary>
+<summary>What is the 3 most abundant genera in each sample (excluding uncultured species)?</summary>
 
-- _Soil1: Acidothermus_
-- _Soil2: uncultured (followed by Acidothermus)_
-- _Soil3: Gaiella_
+- _Soil1: Acidothermus, Conexibacter, Burkholderia-Caballeronia-Paraburkholderia_
+- _Soil2: Acidothermus, Candidatus Solibacter, Conexibacter_
+- _Soil3: Nocardioides, Gaiella, Streptomyces_
 </details>
 
-Using these estimations, we can try to estimate the alpha diversity (using the [KrakenTools](https://github.com/jenniferlu717/KrakenTools) package). 
-Many diversity measurements are implemented in the software, and here we will be using the Shannon alpha diversity:
+Using the Bracken estimations, we can try to estimate the alpha diversity of our samples using the [KrakenTools](https://github.com/jenniferlu717/KrakenTools) package. 
+Many diversity measurements are implemented in the software, but here we will only be using the Shannon alpha diversity:
 
 ```
 alpha_diversity.py -f Soil_1.bracken -a Sh
@@ -642,34 +761,41 @@ alpha_diversity.py -f Soil_3.bracken -a Sh
 > `-a Sh` specifies that we want to use the Shanon Index
 
 <details>
-<summary>Which of the samples has the highest diversity?</summary>
+<summary>Which of the samples has the highest alpha diversity?</summary>
 
 _Soil3 (4.769)_
 </details>
 
 We can also calculate the beta-diversity between the three samples. 
 The `beta_diversity.py` script from KronaTools calculates the Bray-Curtis dissimilarity matrix, 
-where a score of 0 means samples with exactly the same species distribution, and 1 are totally different samples.
+where a score of 0 means samples have exactly the same species distribution, and a score of 1 means we have totally different samples.
+This means that the score is more of "dissimilarity" measure, as a higher score means less similar samples.
 
 ```
 beta_diversity.py -i *bracken --type bracken
 ```
 
 <details>
-<summary>Do the observed differences between samples are what you expected based on the Krona plots?</summary>
+<summary>Do the observed differences in diversity between samples are what you expected based on the Krona plots?</summary>
 
 _Yes, Soil1 and Soil2 have a low dissimilarity (0.382), while Soil3 is more dissimilar to the other 2 (0.426-0.562)._
 </details>
 
-Now, we will also use Metaphlan to analyse the samples. 
-Sadly, 16S sequences are not included in the Metaphlan marker database, so running metaphlan itself is no use here. 
+<details>
+<summary>Why do we have X's in some places of the table?</summary>
+
+_Because the table is symmetrical: the dissimilarity between 1 & 3 is the same as the dissimilarity between 3 & 1._
+</details>
+
+We can also use Metaphlan to analyse the samples.
+Sadly, 16S sequences are not included in the Metaphlan marker database, so running metaphlan itself is of no use here. 
 However, using KronaTools, we can convert our Kraken2 output to a metaphlan output. 
 As not all libraries contain the same number of reads, we will use percentages instead of read counts (which is also used by metaphlan itself):
 
 ```
-kreport2mpa.py -r Soil_1.kraken.report -o Soil_1.metaphlan.txt --percentages
-kreport2mpa.py -r Soil_2.kraken.report -o Soil_2.metaphlan.txt --percentages
-kreport2mpa.py -r Soil_3.kraken.report -o Soil_3.metaphlan.txt --percentages
+kreport2mpa.py -r Soil_1.bracken.kreport -o Soil_1.metaphlan.txt --percentages
+kreport2mpa.py -r Soil_2.bracken.kreport -o Soil_2.metaphlan.txt --percentages
+kreport2mpa.py -r Soil_3.bracken.kreport -o Soil_3.metaphlan.txt --percentages
 ```
 
 Our kraken analysis only goes to genus level, so we’ll try counting the number of genera in the samples:
@@ -680,35 +806,36 @@ grep "g__" Soil_2.metaphlan.txt | wc -l
 grep "g__" Soil_3.metaphlan.txt | wc -l
 ```
 
-It looks like there are many genera identified, many of the with only few reads. 
-Let’s do some filtering. We will remove “uncultured” genera, and only keep genera with a higher proportion than 0.5%.
+It looks like there are many genera identified, but many of them have only few reads assigned to them.
+Let’s do some filtering. We will remove “uncultured” genera, and only keep genera with a proportion above 0.5%.
 We'll do this using some build-in Linux functions:
 
 ```
-grep "g__" Soil_1.metaphlan.txt | awk '{ if ($NF > 0.49) print}' | grep -v "uncultured" > Soil_1.metaphlan.reduced.txt
-grep "g__" Soil_2.metaphlan.txt | awk '{ if ($NF > 0.49) print}' | grep -v "uncultured" > Soil_2.metaphlan.reduced.txt
-grep "g__" Soil_3.metaphlan.txt | awk '{ if ($NF > 0.49) print}' | grep -v "uncultured" > Soil_3.metaphlan.reduced.txt
+grep "g__" Soil_1.metaphlan.txt | awk '{ if ($NF > 0.5) print}' | grep -v "uncultured" > Soil_1.metaphlan.reduced.txt
+grep "g__" Soil_2.metaphlan.txt | awk '{ if ($NF > 0.5) print}' | grep -v "uncultured" > Soil_2.metaphlan.reduced.txt
+grep "g__" Soil_3.metaphlan.txt | awk '{ if ($NF > 0.5) print}' | grep -v "uncultured" > Soil_3.metaphlan.reduced.txt
 ```
 > In this command, we filter the lines that have identifications on genus level `grep "g__"`, 
-> and then only retain lines where the last column has a value strictly higher than 0.49 (`awk '{ if ($NF > 0.49) print}'`. 
+> and then only retain lines where the last column has a value strictly higher than 0.5 (`awk '{ if ($NF > 0.5) print}'`. 
 > Lastly, we use grep again to filter out lines which contain "uncultured" somewhere (`grep -v "uncultured"`)
 
-Since we only filtered out the "genus" lines, we can simply count the number of discovered genera by counting the lines in the files:
+Since we filtered out the "genus" lines only, we can simply count the number of discovered genera by counting the lines in the files:
 
 ```
 wc -l Soil*reduced.txt
 ```
 
-This reduces the number of genera significantly. We can merge the Metaphlan profiles, to create one big table:
+This reduced the number of genera significantly. 
+We can merge the Metaphlan profiles, to create one big table:
 
 ```
 combine_mpa.py -i *reduced.txt -o Soil_merged.tbl
 ```
 
 <details>
-<summary>The combine_mpa script tells us that it printed 26 classifications, but if we count the genera in all 3 samples, we have 47. Why is there a difference?</summary>
+<summary>The combine_mpa script tells us that it printed 56 classifications, but if we count the genera in all 3 samples, we have 94. Why is there a difference?</summary>
 
-_Because there is overlap in genera between samples. There are thus 26 unique genera found, but some of them are present in multiple samples._
+_Because there is overlap in genera between samples. There are thus 56 unique genera found, but some of them are present in multiple samples._
 </details>
 
 If you look at the merged table, the names of the genera are quite long, containing the whole taxonomy.
@@ -718,14 +845,14 @@ We’ll clean up the table a bit using `sed`, by removing everything before the 
 sed -i "s/^.*|//g" Soil_merged.tbl
 ```
 > Here, we are using the substitute command of  `sed`: `sed s/pattern/replacement/g`
-> The leading `s` tells `sed` to do a substitution, and the leading `g` tells `sed` to do it "globally" (so don't stop after the first replacement.
-> We tell `sed` to substitute the pattern `^.*|` and replace it with nothing (there is nothing between the last forwards slashes: `//`) 
-> The `^.*|` pattern roughly translates to "any number of any character (`.*`) after the start of the string (`^`) until you meet a `|`.  
+> The leading `s` tells `sed` to do a substitution, and the trailing `g` tells `sed` to do it "globally" (so don't stop after the first replacement).
+> We tell `sed` to substitute the pattern `^.*|` and replace it with nothing (there is nothing between the last forward slashes: `//`) 
+> The `^.*|` pattern roughly translates to "any number or any character (`.*`) after the start of the string (`^`) until you meet a `|`.  
 > This will effectively remove everything before (and including) the last `|` character.
 
-
 Lastly, we need to slightly change the header before we can visualize the result.
-Open the merged table using nano (`nano Soil_merged.tbl`), and and change the header by removing the leading `#` in the first line, and change the sample headers (e.g. Sample #1 in Soil1).
+Open the merged table using nano (`nano Soil_merged.tbl`), and and change the header by removing the leading `#` in the first line, 
+and change the sample headers to not contain whitespace (e.g. Sample #1 in Soil1).
 Press `Ctrl-O` to save the file, and `Ctrl-X` to quit.
 Now let's have a look at the table:
 
@@ -734,17 +861,39 @@ column -t Soil_merged.tbl
 ```
 > The `column` command will nicely align your columns
 
-<details>
-<summary>Compare the most abundant genera from the heatmap to the those of the first Krona plot. Do they match?</summary>
+Since the table is quite large it is not so straightforward to look for the most abundant species in each sample.
+We can use the sort and head commands again to have the most abundant species per sample:
 
-_Soil1: Acidothermus; Soil2: Acidothermus; Soil3: Nocardioides_
-_This matches the output from the Krona plots._
+```
+sort -nrk2 Soil_merged.tbl | column -t | head -n10
+sort -nrk3 Soil_merged.tbl | column -t | head -n10
+sort -nrk4 Soil_merged.tbl | column -t | head -n10
+```
+
+<details>
+<summary>Compare the 3 most abundant genera from the metaphlan analysis here to the those of the Bracken output. Do they match?</summary>
+
+- _Soil1: Acidothermus, Conexibacter, Candidatus solibacter_
+- _Soil2: Candidatus solibacter, Acidothermus, Conexibacter_
+- _Soil3: Nocardioides, Gaiella, Streptomyces_
+
+_This does not match with the Bracken output._ 
+_If we have a closer look at the Bracken output, we can see that there is a space in some species names (e.g. Candidatus Solibacter)._
+_Since sort treats any whitespace (spaces and tabs) as column delimiters, it will wrongly count the columns when there is a space in the any column value._
+_We can tell sort to only count tabs as column delimiters: `sort -nrk6 -t$'\t' Soil_1.bracken | head -n 10` should give the correct sorting.
 </details>
 
-As you might notice, the results from both analyses differ from each other. 
-Without going into too much detail, the main difference is that our first analysis we used the Bracken results, and in our Metaphlan-based analysis, we used the Kraken result. 
-As seen in the lecture, Kraken classifies the reads using the LCA approach (Last Common Ancestor). 
-As such, not all reads are classified will be classified to species/genus level. 
-As such, our method of extracting just the rows that are classified to the genus level will only represent a subset of our total reads. 
-That’s why it’s better to run Bracken after you run Kraken, as Bracken modifies the classification to make sure that reads are classified on the desired taxonomical level. 
-If you want, you could try to run the Metaphlan based analysis on the bracken output rather than the kraken output and compare the results.
+Here we only created a metaphlan merged table. There is much more you can do with this table, but we won't go into it here.
+See the [Metaphlan](https://huttenhower.sph.harvard.edu/metaphlan) page for a full overview of all functionalities.
+Additionally, if you want to have an overview of metagenomic tools in general, you can find a good review [here](https://link.springer.com/article/10.1007/s13238-020-00724-8).
+
+## Cleanup
+
+Once you have performed all the analyses, it is time to do some cleanup. We will remove some files that we don't need anmyore, and will compress files to save space.
+
+Compress the filtered reads:
+```
+gzip *fastq
+```
+> Compressing the `fastq` files can take some time. You can launch it in the background by running 'nohup gzip *fastq &' instead.
+> This will make it so that the command will keep running untill it is done, even when you log out of the server.
