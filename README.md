@@ -4,11 +4,16 @@ This repository contains all necessary material for the practical exercises of t
 
 ## How to use
 
-All practicals are self-contained. This means that you don't need data from one practical to complete another. However, some of the later practicals use concepts first explained in earlier practicals. 
+All practicals are self-contained. 
+This means that you don't need data from one practical to complete another. 
+However, some of the later practicals use concepts first explained in earlier practicals. 
 
-All tools and data are provided on an [NREC](https://www.nrec.no/) server for students taking the course. However, the practicals contain install instructions for the used software tools, and links to the data in case you want to download it yourself.
+All tools and data are provided on an [NREC](https://www.nrec.no/) server for students taking the course. 
+However, the practicals contain installation instructions for the used software tools, and links to the data in case you want to download it yourself.
 
-The practicals are tested and developped on a linux system. They are not guaranteed to work on Mac or Windows. However, using [WSL (Windows subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) should work for Windows users.
+The practicals are tested and developped on a linux system. 
+They are not guaranteed to work on Mac or Windows. 
+However, using [WSL (Windows subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) should work for Windows users.
 
 ## Content
 

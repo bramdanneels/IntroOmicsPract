@@ -24,8 +24,19 @@ The data and software has been setup on the NREC server.
 Before starting the practical, make sure to activate the correct environment before each part of the tutorial 
 (`QC` for the QC part, `Metagenomics` for the metagenomics part)
 
-You can make a copy of the data you will be working on by running this command from your home directory:
-> If your not sure if you are in the home folder, run `cd` or `cd ~` to go to your home directory.
+Then navigate to your work folder.
+We will not work on the home folder (`~` or `/home/{your_username}`) because there is only limited storage space (20Gb).
+You will be working on a mounted drive (200Gb) which is located in `/storage`.
+All students on NREC will have their own folder `/storage/{your_username}` (e.g. `/storage/brdan` if your username is "brdan").
+
+First of all, go to your work folder:
+
+```
+cd /storage/{your_username}
+```
+> Replace `{your_username}` with your username on the server.
+
+You can make a copy of the data you will be working on by running this command from your work directory:
 
 ```
 mkdir -p Practical6
@@ -45,7 +56,7 @@ See [the intro practical](00_IntroSetup.md) on how to install mamba, and how to 
 To create a new environment including the necessary tools for this practical, run the following command:
 
 ```
-mamba create -n Metagenomics -c bioconda -c conda-forge spades kraken2 krona metaphlan checkm-genome krakentools concoct bwa-mem2 quast bracken flye minimap2 flash2
+mamba create -n Metagenomics spades kraken2 krona metaphlan checkm-genome krakentools concoct bwa-mem2 quast bracken flye minimap2 flash2
 ```
 > This will create a new environment called "Transcriptome" with the necessary tools.
 > We'll use bwa-mem2 and minimap2 for mapping reads, and flash2 for merging paired reads together.
