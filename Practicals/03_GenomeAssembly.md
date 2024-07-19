@@ -21,8 +21,19 @@ The data and software has been set up on the NREC server.
 Before starting the practical, make sure to activate the correct environment before each part of the tutorial!
 (e.g; `QC` for the QC part, `Assembly` for the assembly part)
 
-You can make a copy of the data you will be working on by running this command from your home directory:
-> If your not sure if you are in the home folder, run `cd` or `cd ~` to go to your home directory.
+Then navigate to your work folder.
+We will not work on the home folder (`~` or `/home/{your_username}`) because there is only limited storage space (20Gb).
+You will be working on a mounted drive (200Gb) which is located in `/storage`.
+All students on NREC will have their own folder `/storage/{your_username}` (e.g. `/storage/brdan` if your username is "brdan").
+
+First of all, go to your work folder:
+
+```
+cd /storage/{your_username}
+```
+> Replace `{your_username}` with your username on the server.
+
+You can make a copy of the data you will be working on by running this command from your work directory:
 
 ```
 mkdir -p Practical3
@@ -512,4 +523,4 @@ rm -r busco_downloads
 ## Analysis using full readsets
 
 In the long read assembly, we only used partial HiFi data, and did not properly pre-process the long reads (due to time and computational constraints).
-If you are curious about what the results would have looked like if we used all data, and properly processed it, you can have a look [here](Other/Assembly_FullAnalysis.md).
+If you are curious about what the results would have looked like if we used all data, and properly processed it, you can have a look [here](../Other/Assembly_FullAnalysis.md).

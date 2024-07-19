@@ -20,8 +20,19 @@ The data and software has been setup on the NREC server.
 Before starting the practical, make sure to activate the correct environment before each part of the tutorial 
 (e.g. `QC` for the QC part, `Transcriptome` for the transcriptome part, `BUSCO` for running BUSCO)
 
-You can make a copy of the data you will be working on by running this command from your home directory:
-> If your not sure if you are in the home folder, run `cd` or `cd ~` to go to your home directory.
+Then navigate to your work folder.
+We will not work on the home folder (`~` or `/home/{your_username}`) because there is only limited storage space (20Gb).
+You will be working on a mounted drive (200Gb) which is located in `/storage`.
+All students on NREC will have their own folder `/storage/{your_username}` (e.g. `/storage/brdan` if your username is "brdan").
+
+First of all, go to your work folder:
+
+```
+cd /storage/{your_username}
+```
+> Replace `{your_username}` with your username on the server.
+
+You can make a copy of the data you will be working on by running this command from your work directory:
 
 ```
 mkdir -p Practical5
@@ -490,11 +501,11 @@ People on NREC can use the commands below to download the necessary files to the
 > The total download size is +- 275 Mbp
 
 ```
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/home/{username}/Practical5/Chr15.fasta' {target directory}
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/home/{username}/Practical5/Chr15.gtf' {target directory}
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/home/{username}/Practical5/TranscriptMap*.bam' {target directory}
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/home/{username}/Practical5/TranscriptMap*.bam.bai' {target directory}
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/home/{username}/Practical5/*stringtie.gtf {target directory}
+scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical5/Chr15.fasta' {target directory}
+scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical5/Chr15.gtf' {target directory}
+scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical5/TranscriptMap*.bam' {target directory}
+scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical5/TranscriptMap*.bam.bai' {target directory}
+scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical5/*stringtie.gtf {target directory}
 ```
 
 Now open IGV. Go to "Genomes" -> "Load genome from file", and load the `Chr15.fasta` file.
