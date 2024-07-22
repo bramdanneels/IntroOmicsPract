@@ -83,6 +83,8 @@ checkm data setRoot {path to CheckM data}
 kraken2-build --special silva --threads 2 --db KrakenSILVADB
 bracken-build -d KrakenSILVADB -t 2 -k 35 -l 300
 ```
+> This will install the KrakenDB in your current directory.
+> Change the `--db` argument if you want to store the database elsewhere.
 
 - Fix a Concoct bug:
 
