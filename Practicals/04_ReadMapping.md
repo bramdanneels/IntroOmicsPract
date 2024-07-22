@@ -215,7 +215,7 @@ Lastly, we will do the same mapping using HiSat2.
 
 ```
 hisat2-build TAIR.fasta TAIR_hisat.index
-time hisat2 -x TAIR_hisat.index -1 Atha_DNA_PE_F.fastq.filt -2 Atha_DNA_PE_R.fastq.filt -S DNA_PE_hisat.sam
+time hisat2 --no-spliced-alignment -x TAIR_hisat.index -1 Atha_DNA_PE_F.fastq.filt -2 Atha_DNA_PE_R.fastq.filt -S DNA_PE_hisat.sam
 samtools view -bS DNA_PE_hisat.sam | samtools sort > DNA_PE_hisat.bam && rm DNA_PE_hisat.sam
 ```
 >HiSat2 will give a warning about an "unsupported file format". 
