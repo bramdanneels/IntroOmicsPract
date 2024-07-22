@@ -314,7 +314,7 @@ All mappings are focussed on the same region on Chr2 of _A. thaliana_.
 
 DNA short read mapping using 3 differen mappers:
 
-![/other/DNA_PE_Map.PNG]
+![DNA paired end mapping using 3 mappers, visualized in IGV](DNA_PE_Map.PNG)
 
 DNA long reads mapping using minimap2
 
