@@ -1,4 +1,4 @@
-# BINF201 – Practical 3 – Genome Assembly
+# Practical 3 – Genome Assembly
 
 In this practical we will assemble bacterial genomes using different assembly software and methods (both for short and long reads), and compare the results.
 

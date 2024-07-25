@@ -1,4 +1,4 @@
-# BINF201 – Practical 4 – Read Mapping
+# Practical 4 – Read Mapping
 
 In this practical we will map different kind of sequencing reads from different types of experiments to the _Arabidopsis thaliana_ (thale cress) reference genome using different mappers.
 

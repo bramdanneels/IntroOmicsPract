@@ -1,4 +1,4 @@
-# BINF201 – Practical 6 – Metagenomics
+# Practical 6 – Metagenomics
 
 In this practical we will have a look at metagenomic data: data containing reads from multiple species.
 We will perform metagenome assemblies and perform binning to try to recover full genomes.

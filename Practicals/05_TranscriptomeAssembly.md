@@ -1,4 +1,4 @@
-# BINF201 – Practical 5 – Transcriptome Assembly
+# Practical 5 – Transcriptome Assembly
 
 In this practical we will perform transcriptome assemblies on a dataset containing RNA-seq reads mapping to the human chromosome 15.
 
