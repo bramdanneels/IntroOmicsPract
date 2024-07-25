@@ -38,7 +38,7 @@ This document can act as a reference of some often used shell commands that can 
 | `cp file1.txt file2.txt` | Copy file1 to file2 |
 | `ln -s /full/path/to/file1 file2` | Make a symbolic link from file1 to file2. This means that if a program wants to read file2, it will be redirected to file1 isntead. If file2 is modified, a copy with the modifications will be made |
 | `ln /full/path/to/file1 file2` | Make a hard link from file1 to file2. This means that if a program wants to read file2, it will be redirected to file1 instead. If file2 is modified, file1 is modified instead |
-| `nano file1.txt` | Allows modifying file1 in the command line text editor `nano`. Other editors exits as well (`vim`,  |
+| `nano file1.txt` | Allows modifying file1 in the command line text editor `nano`. Other editors exits as well (e.g. `vim`) |
 
 ## Miscellaneous commands
 
@@ -106,9 +106,6 @@ but we use `awk` in some of our tutorials, and will explain on the spot what the
 | `cut -d "," -f2,3 file.csv` | Print columns 2 and 3 from "file.txt", but use "," as delimiter instead of Tab |
 | `echo "some text"` | Print a string to the screen ("some text" in this case) |
 
-*
-$
-
 ## Getting help
 
 | Command | Usage |
@@ -129,7 +126,7 @@ You can find the processID (`PID`) by running `top -u username`.
 ### Copying & Pasting
 
 Copying and pasting commands depend heavily on your own operating system, and the program you use for connecting to the server.
-*Remember that `Ctr+c` is the linux command for cancel*, so don't try to use `Ctr+c` and `Ctr+v` for copying/pasting!
+**Remember that `Ctr+c` is the linux command for cancel**, so don't try to use `Ctr+c` and `Ctr+v` for copying/pasting!
 Some options that might work on your system:
 
 - Right click to copy, right click to paste
