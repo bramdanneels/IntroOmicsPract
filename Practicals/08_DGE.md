@@ -16,9 +16,9 @@ Our analysis starts from the `.bam` files created by the alignment/mapping progr
 We have been provided the following files:
 
 - 4 bam files: alignment files, one for each sample
-- Arabidopsis.gtf file: Arabidopsis thaliana reference genome annotation. This contains information about the genes in Arabidopsis and where they are located in the genome.
-- expdesing.txt: experimental design, a comma separated file containing meta data of the samples (which sample is wich condition)
-- gene_description.txt: description of the functions of the genes in Arabidopsis.
+- `Arabidopsis.gtf` file: Arabidopsis thaliana reference genome annotation. This contains information about the genes in Arabidopsis and where they are located in the genome.
+- `expdesing.txt`: experimental design, a comma separated file containing meta data of the samples (which sample is wich condition)
+- `gene_description.txt`: description of the functions of the genes in Arabidopsis.
 
 The data is available for on [Zenodo](https://zenodo.org/records/12772382) (08_DGE.zip).
 Download the data, and extract the `zip` archive to a folder of your choice.
@@ -204,6 +204,7 @@ library(DESeq2, quietly = TRUE)
 ds <- DESeqDataSetFromMatrix(countData=counts_filtered,
 colData=expdesign,
 design= ~ condition)
+```
 
 And then we run the analysis using the prepared object:
 
