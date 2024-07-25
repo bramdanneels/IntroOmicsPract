@@ -1,6 +1,6 @@
 # Transcriptome - Full analysis
 
-During the [transcriptome practical](../Practicals/05_Transcriptome.md) we have generated several transcriptomes from reads mapped to the human Chr15.
+During the [transcriptome practical](../Practicals/05_TranscriptomeAssembly.md) we have generated several transcriptomes from reads mapped to the human Chr15.
 Here we want to show how the transcriptome analysis would have looked like if we had used all reads, mapping to the whole human genome.
 We will only document the used code, and provide the most relevant results, so you can compare to the results from the practical yourself.
 

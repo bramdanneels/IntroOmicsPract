@@ -55,7 +55,7 @@ Sea - metaFlye
 
 Sea - hifiasm-meta
 
-![Sea metagenome assembly Bandage - hifiasm-meta](Sea_hifiasm_Bandage)
+![Sea metagenome assembly Bandage - hifiasm-meta](Sea_hifiasm_Bandage.PNG)
 > The graph is similar to the metaFlye one, but the largerst contig is longer (+- 1.5Mbp).
 > It looks like we might get better results using this assembly.
 
