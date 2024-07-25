@@ -35,3 +35,5 @@ This github page has been developped and published by Bram Danneels. In case of 
 Practical exercises are based on practicals orginally developped by Håkon Tjeldnes.
 
 R-based practicals have been tested & verified by Gutama Ibrahim.
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12772382.svg)](https://doi.org/10.5281/zenodo.12772382)

@@ -312,9 +312,36 @@ Mapping with smalt gives a bit better results (3x Cov, 33% of genome, 50% reads 
 Here you can find some screenshot of the mappings in IGV for your reference.
 All mappings are focussed on the same region on Chr2 of _A. thaliana_.
 
-DNA short read mapping using 3 differen mappers:
+DNA short read mapping using 3 different mappers:
 
-![DNA_PE_Map.PNG]
+![DNA paired end mapping using 3 mappers, visualized in IGV](DNA_PE_Map.PNG)
 
-DNA long reads mapping using minimap2
+DNA long reads mapping using minimap2:
 
+![DNA long read mapping, visualized in IGV](DNA_Long_Map.PNG)
+> Note the higher error rate in Nanopore reads
+
+ChIP-seq data mapped to the genome:
+
+![ChIP seq mapping](DNA_ChIP_Map.PNG)
+> We can nicely see that we have so called "mapping hotspots" where a lot of reads map. 
+These are possible binding sites of the protein used in the experiment, since they are mostly located near the beginning/end of genes.
+
+RNA short read mapping using 2 different mappers:
+
+![RNA short read mapping](RNA_PE_Map.PNG)
+
+RNA long read Nanopore mapping:
+
+![RNA Nanopore mapping](RNA_Nano_Map.PNG)
+
+Mapping reads from a different species (_B. napus_ on _A. thaliana_):
+
+![Other species mapping](DNA_Bnap_Map.PNG)
+> You can see a lot fewer mapped reads, and they only map on specific regions (possibly conserved regions between the species).
+> It looks like the reads map mainly to the exons, since the coding regions are more likely to be conserved between species than non-coding regions.
+
+Mapping RNA reads using a DNA mapper:
+
+![RNA using DNA mapper](RNA_BWA_Map.PNG)
+> You can see that the exon/intron structure is still nicely visible, but we don't have reads that are split up as we have with splice-aware mappers.

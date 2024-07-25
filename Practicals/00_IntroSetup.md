@@ -15,6 +15,7 @@ In praticals 2-6 we will use a range of -omics tools.
 Most -omics/bioinformatic tools are developped for linux, and require some computational resources. 
 Students of the BINF201 course will have access to an [NREC](https://www.nrec.no/) instance with the necessary computational power and pre-installed software. 
 Please check the BINF201 MittUiB course page for more information on how to get access to the BIN201 NREC server.
+A short overview of useful commands, hints, and tips can be found [here](../Other/ShellTips.md)
 If you are working on NREC, you can skip the next parts, and go straight to the `R & Rstudio` section.
 
 It is also possible to do the practicals on your own computer:
@@ -57,7 +58,7 @@ conda config --set channel_priority strict
 All data used in these practicals is publically available. 
 For students of the UiB BINF201 course, all necessary data is already present on the NREC server.
 
-For people who do not have access to NREC and/or want to do the practicals on their own computer, all data used in this practicals is available through [Zenodo]().
+For people who do not have access to NREC and/or want to do the practicals on their own computer, all data used in this practicals is available through [Zenodo](https://zenodo.org/records/12772382).
 Download links to the specific files needed for a tutorial are available in each tutorial.
 
 Alternatively, you can download and pre-process the data yourself. 
