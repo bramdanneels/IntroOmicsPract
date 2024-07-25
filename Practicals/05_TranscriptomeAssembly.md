@@ -60,10 +60,11 @@ mamba create -n Transcriptome trinity hisat2 samtools busco minimap2 stringtie g
 Create a new folder (e.g. `Practical5`), go into it (`cd Practical5`), and then download the necessary data.
 You can either:
 
-- Download directly from the [Zenodo repository]():
+- Download directly from the [Zenodo repository](https://zenodo.org/records/12772382):
 
 ```
-wget link_to_zenodo_file(s)
+wget https://zenodo.org/records/12772382/files/05_Transcriptome.zip
+unzip 05_Transcriptome.zip
 gunzip *gz
 ```
 
@@ -79,6 +80,7 @@ gunzip *gz
 
 <details>
 <summary>Click here to expand the command necessary for setting up the data yourself</summary>
+
 ```
 datasets download genome accession GCF_000001405.40 --chromosomes 15 --include genome,gtf
 unzip ncbi_dataset.zip
@@ -102,7 +104,7 @@ fasterq-dump -p --outdir ./ --split-files SRR24153956/SRR24153956.sra
 mv SRR24153956.fastq RNA_HiFi.fastq
 rm -r SRR24153956*
 
-hisat2-build Chr15.fasta Chr15.index
+hisat2-build -p 2 Chr15.fasta Chr15.index
 hisat2 -p 2 -x Chr15.index -1 RNA_PE_1.fastq -2 RNA_PE_2.fastq -S RNA_PE.sam
 samtools view -b -F 4 RNA_PE.sam | samtools sort -n > RNA_PE.bam
 samtools fastq -1 RNA_PE_F_Chr15.fastq -2 RNA_PE_R_Chr15.fastq -0 /dev/null -s /dev/null RNA_PE.bam
@@ -124,7 +126,7 @@ rm RNA_Nano.fastq RNA_HiFi.fastq RNA_PE_1.fastq RNA_PE_2.fastq *bam *sam
 
 The data for this tutorial are paired Illumina RNA-seq reads, Nanopore RNA, and PacBio HiFi RNA reads from human cells. 
 All read sets have been mapped to the Chr15 chromosome and the mapped reads were extracted.
-For an overview of the data used in this practical, please see the [information sheet on Zenodo]().
+For an overview of the data used in this practical, please see the [information sheet on Zenodo](https://zenodo.org/records/12772382).
 
 ## Quality control
 
@@ -221,7 +223,7 @@ Similar to what we did in the [mapping practical](04_ReadMapping.md), we will id
 ```
 hisat2_extract_splice_sites.py HomSap.gtf > HomSap.ss
 hisat2_extract_exons.py HomSap.gtf > HomSap.exons
-hisat2-build --exon HomSap.exons --ss HomSap.ss Chr15.fasta Chr15.index
+hisat2-build -p 2 --exon HomSap.exons --ss HomSap.ss Chr15.fasta Chr15.index
 ```
 
 Now that we have our genome index, we can align the reads, and create a sorted `bam` file.
@@ -247,7 +249,7 @@ These assembled transcripts can then tell us what genes/transcripts were express
 To piece the mapped reads together, we will use StringTie.
 
 ```
-stringtie -o PE_stringtie.gtf RNA_PE_Chr15.bam
+stringtie -p 2 -o PE_stringtie.gtf RNA_PE_Chr15.bam
 ```
 
 This outputs a new `.gtf` file, similar to the one of the reference. This `.gtf` contains the predicted transcripts (including exons and splice-sites) based on the mapped reads.
@@ -339,6 +341,40 @@ cat PE_Chr15_gffcompare.txt
 We see that the sensitivity has gone up by a lot, but is still not optimal. The precision is still the same, which makes sense.
 Judging from the total number of loci (1616 in the reference, 912 in our stringtie), we likely don't have enough reads mapping to this chromosome to get the full transcriptome.
 
+One cause for our sensitivity problem, is that the reference annotation contains a lot of alternative transcripts.
+There are many splice variants known in humans, but they are not all expressed in the same conditions.
+We can thus never really get to 100% sensitivity based on one sample.
+To have a better idea of our sensitivity, we can compare to a reference annotation which contains only one transcript per locus.
+Here we'll be using the [MANE](https://www.ncbi.nlm.nih.gov/refseq/MANE/) anntation.
+This is an annotation set combining the NCBI RefSeq and Ensembl genome annotations, and picked the most "common" transcript for each gene/locus.
+We can download the reference annotation in `gff` format using the following code:
+
+```
+wget https://ftp.ncbi.nlm.nih.gov/refseq/MANE/MANE_human/current/MANE.GRCh38.v1.3.refseq_genomic.gff.gz
+gunzip MANE.GRCh38.v1.3.refseq_genomic.gff.gz && mv MANE.GRCh38.v1.3.refseq_genomic.gff MANE.gff
+grep "chr15" MANE.gff > Chr15_MANE.gff
+sed -i 's/chr15/NC_000015.10/g' Chr15_MANE.gff
+```
+> We use the sed command to replace "chr15" by "NC_000015.10" to make sure that we're refering to the same reference sequence when comparing our GFF's.
+
+Then we can use that as a reference:
+
+```
+gffcompare -r Chr15_MANE.gff -o PE_Chr15_MANE_gffcompare.txt PE_stringtie.gtf
+cat PE_Chr15_MANE_gffcompare.txt
+```
+
+We see that our sensitivity has gone up to about 40-50%.
+As mentioned before, it is almost impossible to get all possible transcripts from one RNA-seq experiment.
+Many genes are only expressed in specific conditions and/or tissues, which are almost impossible to capture using only one sample.
+
+<details>
+<summary>Using the MANE transcripts has decreased precision. Why could that be?</summary>
+
+_Because we only have 1 transcript per gene/locus, while in the full reference annotation we have multiple transcripts per locus._
+_With the reduced transcript set it is thus less likely we have an exact hit of our assembled transcript, leading to decreased precision._
+</details>
+
 Let's see if we can do a better job using long reads. Since we're dealing with long reads we'll have to use a different mapper. 
 We will be using minimap2 to do splice-aware alignment.
 However, these mapping can easily take multiple hours to complete on 2 cores. 
@@ -366,6 +402,9 @@ With the Stringtie files, we can use GFFcompare again to compare the resulting t
 ```
 gffcompare -r Chr15.gff3 -o Long_Chr15_gffcompare.txt Nano_stringtie.gtf HiFi_stringtie.gtf
 cat Long_Chr15_gffcompare.txt
+
+gffcompare -r Chr15.gff3 -o Long_Chr15_MANE_gffcompare.txt Nano_stringtie.gtf HiFi_stringtie.gtf
+cat Long_Chr15_MANE_gffcompare.txt
 ```
 
 <details>
@@ -374,6 +413,7 @@ cat Long_Chr15_gffcompare.txt
 _The HiFi-based transcriptome has better results than the Nanopore reads (higher sensitivity and precision)._
 _However both long read assemblies have a lot lower precision compared to the short reads._
 _When looking at the number of predicted transcripts, it looks like the long reads create a lot of transcripts (especially Nanopore)._
+_The HiFi-based transcriptome however has a higher sensitivity than the other analyses. This could however be a results from a different experimental setup._
 </details>
 
 An important remark to make in this analysis is that we are dealing with a small dataset (one chromosome), and we are using most of the tools on default settings.
@@ -473,7 +513,7 @@ minimap2 -t 2 -ax splice:hq -uf --junc-bed HomSap.bed Chr15.fasta Trinity_HiFi.f
 ```
 
 We will use the generated bam files in the next section for visualisation.
-	
+
 ## Visualisation
 
 We have now different sets of predicted transcripts. 
@@ -579,4 +619,9 @@ Remove some gffcompare temporary files:
 ```
 rm *tmap *refmap *loci *tracking
 ```
- 
+
+## Analysis on full datasets
+
+In this tutorial we only created the transcriptome of Chr15.
+If you want to have a look on what the analysis would look like if we included all reads, and mapped to the full human genome,
+you can have a look [here](../Other/Transcriptope_FullAnalysis.md).

@@ -63,10 +63,11 @@ mamba create -n Assembly spades abyss megahit quast canu flye hifiasm
 Create a new folder (e.g. `Practical3`), go into it (`cd Practical3`), and then download the necessary data.
 You can either:
 
-- Download directly from the [Zenodo repository]():
+- Download directly from the [Zenodo repository](https://zenodo.org/records/12772382):
 
 ```
-wget link_to_zenodo_file(s)
+wget https://zenodo/org/records/12772382/files/03_Assembly.zip
+unzip 03_Assembly.zip
 gunzip *gz
 ```
 
@@ -105,7 +106,7 @@ a pathogenic bacteria that causes infection of the urinary and genital tracts in
 The data for long-read assembly is composed of Nanopore and PacBio HiFi reads from _Mycoplasma ovipneumoniae_, 
 a pathogenic bacterium causing pneumonia in sheep and goats.
 The reads used here are only subsets of the total data, to make sure the analyses don't take too long to run.
-For an overview of the data used in this practical, please see the [information sheet on Zenodo]().
+For an overview of the data used in this practical, please see the [information sheet on Zenodo](https://zenodo.org/records/12772382).
 
 ## Quality Control
 
@@ -464,6 +465,10 @@ The Canu, Flye, and HiFiasm commands are included below in case you want to run 
 >mv hifiasm* MycOvi_HiFiAsm/
 >```
 > Since hifiasm doesn't output `fasta` directly, only `.gfa`, we use the `awk` command to convert from one to the other format.
+> GFA files contain multiple lines, one of them the sequence lines (starting with S).
+> These sequence lines contain three columns/fields: the category (S for sequence in this case), the identifier (sequence name), and the sequence itself.
+> The `awk` command here will process all lines starting with `S` (`/^S/`), and will print ">" followed by the second field in the line (`print ">"$2`).
+> Then it will print the third field of the line on a new line (`print $3`).
 
 Run Quast on the 4 assemblies, and include the reference genome for this species.
 Since we are working on another species than the long reads, we'll have to find another reference species.

@@ -114,10 +114,11 @@ This should fix the bug and make Concoct run without problems.
 Lastly, create a new folder (e.g. `Practical6`), go into it (`cd Practical6`), and then download the necessary data.
 You can either:
 
-- Download directly from the [Zenodo repository]():
+- Download directly from the [Zenodo repository](https://zenodo.org/records/12772382):
 
 ```
-wget link_to_zenodo_file(s)
+wget https://zenodo.org/records/12772382/files/06_Metagenomics.zip
+unzip 06_Metagenomics.zip
 gunzip *gz
 ```
 
@@ -177,7 +178,7 @@ The data we will use in this tutorial are different kinds of metagenomes:
 - Three soil metagenomes (16S amplicon sequencing, paired Illumina reads)
 
 Most samples have been downsampled to speed up their analysis.
-For an overview of the data used in this practical, please see the [information sheet on Zenodo]().
+For an overview of the data used in this practical, please see the [information sheet on Zenodo](https://zenodo.org/records/12772382).
 
 ## Shotgun metagenomics
 
@@ -287,7 +288,7 @@ In a real example, you would not perform this analysis on a database of 16S sequ
 Kraken2 has such a database, but it takes up >100Gb of space which is too much for this tutorial.
 However, in your data folder we have provided you with the results of the Kraken2 output this larger database containing full genome sequences. 
 Download and take a look at the `Plant.full.krona.html`, `Stool.full.krona.html`, and `Sea.full.krona.html` files.
-> If you don't like downloading the files from NREC to your personal computer, you can download the relevant files directly from [Zenodo]().
+> If you don't like downloading the files from NREC to your personal computer, you can download the relevant files directly from [Zenodo](https://zenodo.org/records/12772382).
 
 <details>
 <summary>What is the most common species in each sample?</summary>
@@ -373,7 +374,7 @@ For your information, the commands used for running the assemblies can be found 
 The reason we provided the assembly graphs (`.gfa`) is because we want to take a look at them.
 A good tool to visualise the structure of our assembly graphs is [Bandage](http://rrwick.github.io/Bandage/). 
 Install the software, and then download the `assembly_graph.fastg` from both assemblies (you might have to rename to avoid overwriting them when downloading).
-> Again, you can download the `.fastg` files directly from [Zenodo]() if you prefer. 
+> Again, you can download the `.fastg` files directly from [Zenodo](https://zenodo.org/records/12772382) if you prefer. 
 Start the Bandage software, and open the `.gfa` files of both assemblies. 
 Once opened, click on the “draw graph” button to draw the bandage graph.
 You can draw a frame over a collection of lines (contigs), and see their total length on the right side of the screen.
@@ -424,8 +425,8 @@ We’ll be using Bwa-mem2 for mapping the short reads, and Minimap2 for mapping 
 bwa-mem2 index -p PMindex Plant_meta.fasta
 bwa-mem2 index -p SMindex Stool_meta.fasta
 mkdir mapping
-bwa-mem2 map -t 2 PMindex ../Plant_F.fastq ../Plant_R.fastq | samtools view -bS | samtools sort > mapping/Plant.bam
-bwa-mem2 map -t 2 SMindex ../Stool_F.fastq ../Stool_R.fastq | samtools view -bS | samtools sort > mapping/Stool.bam
+bwa-mem2 mem -t 2 PMindex ../Plant_F.fastq ../Plant_R.fastq | samtools view -bS | samtools sort > mapping/Plant.bam
+bwa-mem2 mem -t 2 SMindex ../Stool_F.fastq ../Stool_R.fastq | samtools view -bS | samtools sort > mapping/Stool.bam
 minimap2 -t 2 -ax map-hifi Sea_meta.fasta ../Sea_HiFi.fastq | samtools view -bS | samtools sort > mapping/Sea.bam
 samtools index mapping/Plant.bam
 samtools index mapping/Stool.bam
@@ -910,3 +911,9 @@ gzip *fastq
 ```
 > Compressing the `fastq` files can take some time. You can launch it in the background by running 'nohup gzip *fastq &' instead.
 > This will make it so that the command will keep running untill it is done, even when you log out of the server.
+
+## Analysis using all reads
+
+In this tutorial we only used a subset of reads for the metagenome assembly.
+If you're interested in seeing how the results would change if we used the full datasets, 
+you can have a look [here](../Other/Metagenomics_FullAnalysis.md).

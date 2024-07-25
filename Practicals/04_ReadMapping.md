@@ -57,10 +57,11 @@ mamba create -n Mapping hisat2 samtools smalt bwa-mem2 star minimap2
 Create a new folder (e.g. `Practical4`), go into it (`cd Practical4`), and then download the necessary data. 
 You can either:
 
-- Download directly from the [Zenodo repository]():
+- Download directly from the [Zenodo repository](https://zenodo.org/records/12772382):
 
 ```
-wget link_to_zenodo_file(s)
+wget https://zenodo.org/records/12772382/files/04_Mapping.zip
+unzip 04_Mapping.zip
 gunzip *gz
 ```
 
@@ -124,7 +125,7 @@ rm -r SRR25410923*
 The data for this practical are different read sets for _Arabidopsis thaliana_ (thale cress), the most studied plant model, 
 and _Brassica napes_ (rape seed), a crop plant related to _A. thaliana_.
 The reads used here are only subsets of the total data, to make sure the analyses don't take too long to run.
-For an overview of the data used in this practical, please see the [information sheet on Zenodo]().
+For an overview of the data used in this practical, please see the [information sheet on Zenodo](https://zenodo.org/records/12772382).
 
 ##	Quality Control
 
@@ -795,4 +796,9 @@ Remove input data for STAR:
 ```
 rm -r STAR_in
 ```
- 
+
+## Analysis on all reads
+
+In this tutorial we have only mapped subsets of the reads.
+This meant we had some low-coverage samples, leading to difficult interpretation from time to time.
+If you want to have the mapping would look like (statistics + IGV) if we used all reads, you can have a look [here](../Other/Mapping_FullAnalysis.md).
