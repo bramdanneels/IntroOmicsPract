@@ -624,4 +624,4 @@ rm *tmap *refmap *loci *tracking
 
 In this tutorial we only created the transcriptome of Chr15.
 If you want to have a look on what the analysis would look like if we included all reads, and mapped to the full human genome,
-you can have a look [here](../Other/Transcriptope_FullAnalysis.md).
+you can have a look [here](../Other/Transcriptome_FullAnalysis.md).

@@ -130,6 +130,7 @@ gunzip *gz
 
 <details>
 <summary>Click here to expand the command necessary for setting up the data yourself</summary>
+
 ```
 prefetch SRR27874410
 fasterq-dump -p --outdir ./ --split-files SRR27874410/SRR27874410.sra
