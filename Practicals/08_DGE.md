@@ -19,7 +19,6 @@ We have been provided the following files:
 - Arabidopsis.gtf file: Arabidopsis thaliana reference genome annotation. This contains information about the genes in Arabidopsis and where they are located in the genome.
 - expdesing.txt: experimental design, a comma separated file containing meta data of the samples (which sample is wich condition)
 - gene_description.txt: description of the functions of the genes in Arabidopsis.
-```
 
 The data is available for on [Zenodo](https://zenodo.org/records/12772382) (08_DGE.zip).
 Download the data, and extract the `zip` archive to a folder of your choice.
