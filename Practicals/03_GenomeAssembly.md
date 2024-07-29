@@ -63,10 +63,10 @@ mamba create -n Assembly spades abyss megahit quast canu flye hifiasm
 Create a new folder (e.g. `Practical3`), go into it (`cd Practical3`), and then download the necessary data.
 You can either:
 
-- Download directly from the [Zenodo repository](https://zenodo.org/records/12772382):
+- Download directly from the [Zenodo repository](https://zenodo.org/uploads/13120340):
 
 ```
-wget https://zenodo/org/records/12772382/files/03_Assembly.zip
+wget https://zenodo/org/records/13120340/files/03_Assembly.zip
 unzip 03_Assembly.zip
 gunzip *gz
 ```
@@ -106,7 +106,7 @@ a pathogenic bacteria that causes infection of the urinary and genital tracts in
 The data for long-read assembly is composed of Nanopore and PacBio HiFi reads from _Mycoplasma ovipneumoniae_, 
 a pathogenic bacterium causing pneumonia in sheep and goats.
 The reads used here are only subsets of the total data, to make sure the analyses don't take too long to run.
-For an overview of the data used in this practical, please see the [information sheet on Zenodo](https://zenodo.org/records/12772382).
+For an overview of the data used in this practical, please see the [information sheet on Zenodo](https://zenodo.org/uploads/13120340).
 
 ## Quality Control
 
