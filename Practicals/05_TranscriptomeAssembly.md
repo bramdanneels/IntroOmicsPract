@@ -60,10 +60,10 @@ mamba create -n Transcriptome trinity hisat2 samtools busco minimap2 stringtie g
 Create a new folder (e.g. `Practical5`), go into it (`cd Practical5`), and then download the necessary data.
 You can either:
 
-- Download directly from the [Zenodo repository](https://zenodo.org/records/12772382):
+- Download directly from the [Zenodo repository](https://doi.org/10.5281/zenodo.12772382):
 
 ```
-wget https://zenodo.org/records/12772382/files/05_Transcriptome.zip
+wget https://doi.org/10.5281/zenodo.12772382/files/05_Transcriptome.zip
 unzip 05_Transcriptome.zip
 gunzip *gz
 ```
@@ -126,7 +126,7 @@ rm RNA_Nano.fastq RNA_HiFi.fastq RNA_PE_1.fastq RNA_PE_2.fastq *bam *sam
 
 The data for this tutorial are paired Illumina RNA-seq reads, Nanopore RNA, and PacBio HiFi RNA reads from human cells. 
 All read sets have been mapped to the Chr15 chromosome and the mapped reads were extracted.
-For an overview of the data used in this practical, please see the [information sheet on Zenodo](https://zenodo.org/records/12772382).
+For an overview of the data used in this practical, please see the [information sheet on Zenodo](https://doi.org/10.5281/zenodo.12772382).
 
 ## Quality control
 

@@ -58,7 +58,7 @@ conda config --set channel_priority strict
 All data used in these practicals is publically available. 
 For students of the UiB BINF201 course, all necessary data is already present on the NREC server.
 
-For people who do not have access to NREC and/or want to do the practicals on their own computer, all data used in this practicals is available through [Zenodo](https://zenodo.org/records/12772382).
+For people who do not have access to NREC and/or want to do the practicals on their own computer, all data used in this practicals is available through [Zenodo](https://doi.org/10.5281/zenodo.12772382).
 Download links to the specific files needed for a tutorial are available in each tutorial.
 
 Alternatively, you can download and pre-process the data yourself. 
