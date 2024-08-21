@@ -96,7 +96,7 @@ but we use `awk` in some of our tutorials, and will explain on the spot what the
 | `top` | See which processes are running, and who's running them |
 | `top -u username` | See which processes are running from the user named "username" |
 | `history` | Print the history of the last command used |
-| `history | grep "awk"` | Print all previous command containing "awk" |
+| `history \| grep "awk"` | Print all previous command containing "awk" |
 | `!!` | Rerun the previous command |
 | `!1255` | Rerun command 1255 (see `history` to check the numbers of teh commands) |
 | `!!:gs/sample1/sample2` | Rerun the last command, but replace all instances of "sample1" with "sample2". E.g. `fastqc sample1.fastq -o sample1.fastqc.out` will become `fastqc sample2.fastq -o sample2.fastqc.out` |
