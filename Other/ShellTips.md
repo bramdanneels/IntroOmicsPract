@@ -31,7 +31,7 @@ This document can act as a reference of some often used shell commands that can 
 | `mkdir -p /create/new` | Create a folder called `new` in the folder `/create`, and create the parent folder(s) (`/create`) if they don't exist. `-p` will also not give an error if the folder you are trying to create already exists |
 | `touch file.txt` | Create an empty file named `file.txt` |
 | `cat > file.txt` | Start writing to file. Everything typed into the terminal will be stored in `file.txt`. Press `Ctr+C` to stop writing |
-| `cat "some command" > file.txt` | Write the string "some command" to `file.txt` |
+| `echo "some command" > file.txt` | Write the string "some command" to `file.txt` |
 | `cat fileA.txt fileB.txt > fileAB.txt` | Write the contents of fileA and fileB to fileAB |
 | `mv fileA.txt folder/fileA.txt` | Move fileA to folder/ |
 | `mv fiel1.txt fileA.txt` | Rename fielA.txt to fileA.txt |
