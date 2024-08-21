@@ -88,9 +88,9 @@ but we use `awk` in some of our tutorials, and will explain on the spot what the
 | --- | --- |
 | `command infile > outfile` | Prints output from the "command" program to a file named outfile |
 | `command infile 1> outfile 2> errors.log` | Prints the output to "outfile", and errors to "errors.log" |
-| `command1 infile | command2 > outfile` | Use the output from command1 as input for command2, and store the output from command2 in "outfile" |
+| `command1 infile \| command2 > outfile` | Use the output from command1 as input for command2, and store the output from command2 in "outfile" |
 | `command1 infile > out1 && command2 out1 > out2` | Run command1, and if it succeeds, run command2 |
-| `command1 infile > out || command2 infile > out` | Run command1, and if it fails, run command2 |
+| `command1 infile > out \|\| command2 infile > out` | Run command1, and if it fails, run command2 |
 | `wc file.txt` | Count the number of words (groups of characters separated by whitespace) in "file.txt" |
 | `wc -l file.txt` | Count the number of lines in "file.txt" |
 | `top` | See which processes are running, and who's running them |
@@ -169,7 +169,7 @@ To get the value of the variable, you prepend the "$" sign to the variable:
 | `echo $FILE` | Prints the value of FILE to the screen |
 | `cat $FILE` | Prints the content of the file the variable refers to |
 | `rm $FILE` | Remove the file the variable refers to |
-| `mv $FILE ${FILE}.moved` | Rename the file the variable referes to (from `file.txt` to `file.txt.moved` |
+| `mv $FILE ${FILE}.moved` | Rename the file the variable referes to (from `file.txt` to `file.txt.moved`) |
 > The curly brackets (`{ }`) in the last command are used to show which part of the text belongs to the dollar, and which not.
 
 There are some special variables that are used as well:
