@@ -166,6 +166,8 @@ FILE=/path/to/some/file.txt
 While not obligatory, variables in the Shell are usually capitalized.
 To get the value of the variable, you prepend the "$" sign to the variable:
 
+| Command | Usage |
+| --- | --- |
 | `echo $FILE` | Prints the value of FILE to the screen |
 | `cat $FILE` | Prints the content of the file the variable refers to |
 | `rm $FILE` | Remove the file the variable refers to |
