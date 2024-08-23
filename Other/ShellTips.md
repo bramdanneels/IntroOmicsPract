@@ -1,6 +1,7 @@
 # Shell tips & tricks
 
 This document can act as a reference of some often used shell commands that can make life easier when working on the command line.
+For a more detailed tutorial on how to use the command line, see [here](https://swcarpentry.github.io/shell-novice/).
 
 ## Navigating the filesystem
 
