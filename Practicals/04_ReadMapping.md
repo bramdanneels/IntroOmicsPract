@@ -191,7 +191,7 @@ We will start by mapping the normal Illumina Paired-end reads using the three ma
 
 Let's start by using Smalt. The first step of mapping, is indexing the genome. 
 This will make it easier to search the genome for positions where the reads map.
-Make sure to activate the Mapping environment: `mamba activate Mapping` before running the commands.
+Make sure to activate the Mapping environment: `conda activate Mapping` before running the commands.
 
 ```
 smalt index -k 15 -s 8 TAIR_smalt.index TAIR.fasta

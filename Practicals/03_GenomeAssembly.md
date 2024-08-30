@@ -111,7 +111,7 @@ For an overview of the data used in this practical, please see the [information 
 ## Quality Control
 
 Before assembling a genome, it is important to take a look at the data first. 
-Activate the QC environment created in practical 2: `mamba activate QC`.
+Activate the QC environment created in practical 2: `conda activate QC`.
 Then, run FastQC on all four files, download the files, and look at the reports.
 
 <details>
@@ -145,7 +145,7 @@ We will assemble the genome from the short reads using three different assembler
 The first one, [SPAdes](https://github.com/ablab/spades), is one of the most popular genome assemblers for small genomes (viral, bacterial, yeast). 
 It is also very popular for doing metagenome assembly (see practical 6).
 
-We will run SPAdes in two different modes: the "isolate" and the "careful" mode. Remember to switch back to the assembly environment first: `mamba deactivate && mamba activate Assembly`).
+We will run SPAdes in two different modes: the "isolate" and the "careful" mode. Remember to switch back to the assembly environment first: `conda deactivate && conda activate Assembly`).
 > The `&&` in the above command tells the command line "Do the first command (deactivate), and if that succeeds, run the second command (activate).
 
 ```
@@ -376,7 +376,7 @@ The BUSCO tool uses a database which contains sets of conserved genes (universal
 By checking how much of the genes that should be in your assembly are actually in your assembly, you can have a rough idea of how complete your assembly is.
 
 We will run BUSCO on the SPAdes-isolate assembly, the ABySS-k75 assembly, and the ABySS-k31 assembly. The most important step to running BUSCO is figuring out what lineage to use.
-BUSCO doesn't always run nicely with other programs, thus we had to install it in a separate environment (called "BUSCO"). So first activate the enviroment BUSCO (`mamba activate BUSCO`).
+BUSCO doesn't always run nicely with other programs, thus we had to install it in a separate environment (called "BUSCO"). So first activate the enviroment BUSCO (`conda activate BUSCO`).
 To get an overview of which lineages are available, you can run the following commands:
 
 ```
