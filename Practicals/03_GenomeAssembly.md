@@ -476,7 +476,7 @@ Try modifying the download command from the first part of the tutorial (where we
 You can search for the accession number of the reference genome on [NCBI genomes](https://www.ncbi.nlm.nih.gov/genome/).
 
 <details>
-<summary>Based on assembly statistics alone, are these assemblies better or worse than the assemblies we have made using short reads? (the expected genomes size is +- 1 Gbp)</summary>
+<summary>Based on assembly statistics alone, are these assemblies better or worse than the assemblies we have made using short reads? (the expected genomes size is +- 1 Mbp)</summary>
 
 _A lot better. Most assemblers manage to form one big contig close to the expected genome size._
 </details>
