@@ -40,7 +40,7 @@ You can make a copy of the data you will be working on by running this command f
 
 ```
 mkdir -p Practical6
-ln -s /storage/data/06_Transcriptome/* Practical6/
+ln -s /storage/data/06_Metagenomics/* Practical6/
 ```
 > `mkdir -p` creates a folder called Practical6. The "-p" options tells mkdir to create subdirectories if necessary, and to not give an error if the folder(s) already exist
 > `ln -s` creates what we call a "symbolic link". This creates a small file that just says "Instead of this file, use the file that I'm liking to". 
@@ -374,8 +374,8 @@ For your information, the commands used for running the assemblies can be found 
 
 The reason we provided the assembly graphs (`.gfa`) is because we want to take a look at them.
 A good tool to visualise the structure of our assembly graphs is [Bandage](http://rrwick.github.io/Bandage/). 
-Install the software, and then download the `assembly_graph.fastg` from both assemblies (you might have to rename to avoid overwriting them when downloading).
-> Again, you can download the `.fastg` files directly from [Zenodo](https://zenodo.org/uploads/13120340) if you prefer. 
+Install the software, and then download the assembly graph from both assemblies (you might have to rename to avoid overwriting them when downloading).
+> Again, you can download the `.gfa` files directly from [Zenodo](https://zenodo.org/uploads/13120340) if you prefer. 
 Start the Bandage software, and open the `.gfa` files of both assemblies. 
 Once opened, click on the “draw graph” button to draw the bandage graph.
 You can draw a frame over a collection of lines (contigs), and see their total length on the right side of the screen.
