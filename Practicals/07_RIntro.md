@@ -256,9 +256,9 @@ named_list$d
 This allows us to store complex data easily. For example, you could represent a FastQ entry as an R list as follows:
 
 ```
-read <- list(read_id = @rtuuk-2048fh4-ljkr-werjjt90,
-			sequence = ATCGAGAAGGAGGAGA,
-			quality = jjccdddbbbbbdddd,
+read <- list(read_id = "@rtuuk-2048fh4-ljkr-werjjt90",
+			sequence = "ATCGAGAAGGAGGAGA",
+			quality = "jjccdddbbbbbdddd",
 			length = 16)
 ```
 
