@@ -66,7 +66,7 @@ sig_genes_df = subset(df, padj < 0.05)
 sig_genes_df <- na.omit(sig_genes_df)
 
 # Filter on log2fold change (|log2FoldChange| > 2)
-sig_genes_df <- names(sig_genes_df)[abs(sig_genes_df) > 2]
+sig_genes_df <- subset(sig_genes_df, abs(log2FoldChange) > 2)
 
 # Lastly, we need the list of DE genes, and the list of all genes:
 allgenes = df$X
