@@ -20,7 +20,7 @@ If you are working on NREC, you can skip the next parts, and go straight to the 
 
 It is also possible to do the practicals on your own computer:
 If you have a Linux system, you can just install the necessary software and download the necessary data yourself (instructions will be provided in the tutorials themselves).
-If you have a Windows system, it is advised to use [WSL (Windows subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install).
+If you have a Windows system, it is advised to use [WSL (Windows subsystem for Linux)](https://learn.microsoft.com/en-us/windows/wsl/install).
 Then, you can run install and run the necessary on the WSL as if you are working on Linux.
 For Mac users, it should be possible to install and run most of the software on the command line similar to Linux users.
 However, some packages are not fully up to date for Mac compared to Linux, which can cause problems.
