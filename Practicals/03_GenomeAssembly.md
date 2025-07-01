@@ -392,7 +392,7 @@ This will give you a list of lineages that you can use. But how do we find the c
 Here, we will let BUSCO try to figure out what we are dealing with:
 
 ```
-busco -m geno -i spades_isolate/scaffolds.fasta --auto-lineage-prok
+busco -m geno -c 2 -i spades_isolate/scaffolds.fasta --auto-lineage-prok
 ```
 > The `-m` option selects the running mode (here `geno` for genome, other options are `trans` (transcriptome) or `prot`(protein)).
 > Since we know that we are dealing with a bacterium, we can constrain the automatic lineage selection to only search for prokaryotes (`--auto-lineage-prok`). 
