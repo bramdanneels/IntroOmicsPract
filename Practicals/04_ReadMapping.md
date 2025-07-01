@@ -60,9 +60,9 @@ You can either:
 - Download directly from the [Zenodo repository](https://zenodo.org/uploads/13120340):
 
 ```
-wget https://zenodo.org/uploads/13120340/files/04_Mapping.zip
+wget https://zenodo.org/records/13120340/files/04_Mapping.zip
 unzip 04_Mapping.zip
-gunzip *gz
+pigz -d 04_Mapping/*gz
 ```
 
 - Download and process the data manually using the commands below:
