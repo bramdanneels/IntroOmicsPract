@@ -50,7 +50,7 @@ See [the intro practical](00_IntroSetup.md) on how to install mamba, and how to 
 To create a new environment including the necessary tools for this practical, run the following command:
 
 ```
-mamba create -n Mapping hisat2 samtools smalt bwa-mem2 star minimap2
+mamba create -n Mapping hisat2 samtools smalt bwa-mem2 star minimap2 fastqc multiqc cutadapt
 ```
 > This will create a new environment called "Mapping" with the necessary tools.
 
