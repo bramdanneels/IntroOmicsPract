@@ -66,7 +66,7 @@ You can either:
 - Download directly from the [Zenodo repository](https://zenodo.org/uploads/13120340):
 
 ```
-wget https://zenodo/org/records/13120340/files/03_Assembly.zip
+wget https://zenodo.org/records/13120340/files/03_Assembly.zip
 unzip 03_Assembly.zip
 gunzip 03_Assembly/*gz
 ```
