@@ -56,7 +56,7 @@ See [the intro practical](00_IntroSetup.md) on how to install mamba, and how to 
 To create a new environment including the necessary tools for this practical, run the following command:
 
 ```
-mamba create -n Metagenomics spades kraken2 krona metaphlan checkm-genome krakentools concoct bwa-mem2 quast bracken flye minimap2 flash2
+mamba create -n Metagenomics spades kraken2 krona metaphlan checkm-genome krakentools concoct bwa-mem2 quast bracken flye minimap2 flash2 cutadapt
 ```
 > This will create a new environment called "Transcriptome" with the necessary tools.
 > We'll use bwa-mem2 and minimap2 for mapping reads, and flash2 for merging paired reads together.
@@ -117,9 +117,9 @@ You can either:
 - Download directly from the [Zenodo repository](https://zenodo.org/uploads/13120340):
 
 ```
-wget https://zenodo.org/uploads/13120340/files/06_Metagenomics.zip
+wget https://zenodo.org/records/13120340/files/06_Metagenomics.zip
 unzip 06_Metagenomics.zip
-gunzip *gz
+pigz -d 06_Metagenomics/*gz
 ```
 
 - Download and filter the data manually using the commands below:
