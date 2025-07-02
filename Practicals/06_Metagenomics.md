@@ -237,9 +237,9 @@ cat Stool_R.fastq Stool_R.fastq > Stool_all.fastq
 Then we will run Kraken2, using a 16S database from [SILVA](https://www.arb-silva.de/):
 
 ```
-kraken2 --db /storage/dbs/KrakenSILVADB/ --threads 2 --output Plant.kraken.out --report Plant.kraken.report Plant_all.fastq
-kraken2 --db /storage/dbs/KrakenSILVADB/ --threads 2 --output Stool.kraken.out --report Stool.kraken.report Stool_all.fastq
-kraken2 --db /storage/dbs/KrakenSILVADB/ --threads 2 --output Sea.kraken.out --report Sea.kraken.report Sea_HiFi.fastq
+kraken2 --db /storage/data/KrakenSILVADB/ --threads 2 --output Plant.kraken.out --report Plant.kraken.report Plant_all.fastq
+kraken2 --db /storage/data/KrakenSILVADB/ --threads 2 --output Stool.kraken.out --report Stool.kraken.report Stool_all.fastq
+kraken2 --db /storage/data/KrakenSILVADB/ --threads 2 --output Sea.kraken.out --report Sea.kraken.report Sea_HiFi.fastq
 ```
 
 Take a look at the generated reports:
