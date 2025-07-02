@@ -701,9 +701,9 @@ cat Soil_3*.fastq > Soil_3A.fastq
 Since we are dealing with 16S data, using the SILVA database should give better results then when we were working with shotgun data.
 
 ```
-kraken2 --db /storage/dbs/KrakenSILVADB/ --threads 2 --output Soil_1.kraken.out --report Soil_1.kraken.report Soil_1A.fastq
-kraken2 --db /storage/dbs/KrakenSILVADB/ --threads 2 --output Soil_2.kraken.out --report Soil_2.kraken.report Soil_2A.fastq
-kraken2 --db /storage/dbs/KrakenSILVADB/ --threads 2 --output Soil_3.kraken.out --report Soil_3.kraken.report Soil_3A.fastq
+kraken2 --db /storage/data/KrakenSILVADB/ --threads 2 --output Soil_1.kraken.out --report Soil_1.kraken.report Soil_1A.fastq
+kraken2 --db /storage/data/KrakenSILVADB/ --threads 2 --output Soil_2.kraken.out --report Soil_2.kraken.report Soil_2A.fastq
+kraken2 --db /storage/data/KrakenSILVADB/ --threads 2 --output Soil_3.kraken.out --report Soil_3.kraken.report Soil_3A.fastq
 ```
 
 We will again visualise the results in a krona plot:
