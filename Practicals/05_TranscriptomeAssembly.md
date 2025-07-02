@@ -63,9 +63,9 @@ You can either:
 - Download directly from the [Zenodo repository](https://zenodo.org/uploads/13120340):
 
 ```
-wget https://zenodo.org/uploads/13120340/files/05_Transcriptome.zip
+wget https://zenodo.org/records/13120340/files/05_Transcriptome.zip
 unzip 05_Transcriptome.zip
-gunzip *gz
+pigz 05_Transcriptome/*gz
 ```
 
 - Download and filter the data manually using the commands below:
