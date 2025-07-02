@@ -65,7 +65,7 @@ You can either:
 ```
 wget https://zenodo.org/records/13120340/files/05_Transcriptome.zip
 unzip 05_Transcriptome.zip
-pigz 05_Transcriptome/*gz
+pigz -d 05_Transcriptome/*gz
 ```
 
 - Download and filter the data manually using the commands below:
