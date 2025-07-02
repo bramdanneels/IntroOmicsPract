@@ -508,6 +508,7 @@ In Minimap2 there is no preset option to map transcripts to a genome, so we'll t
 Since we're only mapping +- 4500 transcripts to the genome, this mapping goes very fast.
 
 ```
+paftools.js gff2bed HomSap.gtf > HomSap.bed
 minimap2 -t 2 -ax splice:hq -uf --junc-bed HomSap.bed Chr15.fasta Trinity_PE.fasta | samtools view -b | samtools sort > TranscriptMap_PE.bam
 minimap2 -t 2 -ax splice:hq -uf --junc-bed HomSap.bed Chr15.fasta Trinity_HiFi.fasta | samtools view -b | samtools sort > TranscriptMap_HiFi.bam
 ```
