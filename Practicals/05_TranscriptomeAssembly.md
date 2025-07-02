@@ -52,7 +52,7 @@ See [the intro practical](00_IntroSetup.md) on how to install mamba, and how to 
 To create a new environment including the necessary tools for this practical, run the following command:
 
 ```
-mamba create -n Transcriptome trinity hisat2 samtools busco minimap2 stringtie gffcompare ncbi-datasets-cli seqtk
+mamba create -n Transcriptome trinity hisat2 samtools busco minimap2 stringtie gffcompare ncbi-datasets-cli seqtk cutadapt
 ```
 > This will create a new environment called "Transcriptome" with the necessary tools.
 > The ncbi-datasets-cli will allow us to download our reference genome.
