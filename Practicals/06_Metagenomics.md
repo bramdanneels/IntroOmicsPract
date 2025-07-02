@@ -735,9 +735,9 @@ Since the SILVA database only classifies on genus level, we will do the analysis
 Furthermore, we will limit ourselves to species with at least 10 reads assigned to them:
 
 ```
-bracken -d /storage/dbs/KrakenSILVADB/ -i Soil_1.kraken.report -o Soil_1.bracken -w Soil_1.bracken.kreport -r 300 -l "G" -t 10
-bracken -d /storage/dbs/KrakenSILVADB/ -i Soil_2.kraken.report -o Soil_2.bracken -w Soil_2.bracken.kreport -r 300 -l "G" -t 10
-bracken -d /storage/dbs/KrakenSILVADB/ -i Soil_3.kraken.report -o Soil_3.bracken -w Soil_3.bracken.kreport -r 300 -l "G" -t 10
+bracken -d /storage/data/KrakenSILVADB/ -i Soil_1.kraken.report -o Soil_1.bracken -w Soil_1.bracken.kreport -r 300 -l "G" -t 10
+bracken -d /storage/data/KrakenSILVADB/ -i Soil_2.kraken.report -o Soil_2.bracken -w Soil_2.bracken.kreport -r 300 -l "G" -t 10
+bracken -d /storage/data/KrakenSILVADB/ -i Soil_3.kraken.report -o Soil_3.bracken -w Soil_3.bracken.kreport -r 300 -l "G" -t 10
 ```
 > We specify the average read length (`-l 300`), and specify we want to classify on Genus level (`-l "G"`). 
 > We use a read length of 300 since most of our merged reads are that length (= size of the amplicon).
