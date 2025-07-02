@@ -1,6 +1,8 @@
 # Practical 1 - Genome browsers
 
-In this first practical exercise we will have a look at different genome browsers, and familiarize with them. The main aim is to make you comfortable using genome browsers, as we will use genome browsers throughout the practical exercises to visualize some of our results. 
+In this first practical exercise we will have a look at different genome browsers, and familiarize with them. 
+The main aim is to make you comfortable using genome browsers, as we will use genome browsers throughout the practical exercises to visualize some of our results. 
+In addition, it will introduce some genomic concepts that will come back later in the course.
 
 ## USCS Genome Browser
 

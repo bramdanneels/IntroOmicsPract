@@ -68,7 +68,7 @@ You can either:
 ```
 wget https://zenodo.org/records/13120340/files/03_Assembly.zip
 unzip 03_Assembly.zip
-gunzip 03_Assembly/*gz
+pigz -d 03_Assembly/*gz
 ```
 
 - Download manually using the commands below:
@@ -145,7 +145,7 @@ We will assemble the genome from the short reads using three different assembler
 The first one, [SPAdes](https://github.com/ablab/spades), is one of the most popular genome assemblers for small genomes (viral, bacterial, yeast). 
 It is also very popular for doing metagenome assembly (see practical 6).
 
-We will run SPAdes in two different modes: the "isolate" and the "careful" mode. Remember to switch back to the assembly environment first: `conda deactivate && conda activate Assembly`).
+We will run SPAdes in two different modes: the "isolate" and the "careful" mode. Remember to switch back to the assembly environment first (`conda deactivate && conda activate Assembly`).
 > The `&&` in the above command tells the command line "Do the first command (deactivate), and if that succeeds, run the second command (activate).
 
 ```
@@ -386,20 +386,20 @@ busco --list-datasets
 This will give you a list of lineages that you can use. But how do we find the correct lineage? There are 3 options:
 
 - You look up the taxonomy (e.g. on [NCBI taxonomy](https://www.ncbi.nlm.nih.gov/taxonomy), and check if any of the taxonomic levels is available in BUSCO.
-- Let BUSCO figure out the best lineage (using the `--auto-lineage` option. However, this will increase run time and doesn't always work out).
+- Let BUSCO figure out the best lineage (using the `--auto-lineage` option).
 - Only use a general lineage (e.g. Bacteria or Eukaryota) 
 
-Here, we will let BUSCO try to figure out what we are dealing with:
+While the automatic lineage selection looks tempting, it is quite computationally heavy. In addition, it doesn't always select the best lineage, especially in taxa which are underrepresented in the underlying database.
+Here, we will run BUSCO both on a general and a specific dataset:
 
 ```
-busco -m geno -c 2 -i spades_isolate/scaffolds.fasta --auto-lineage-prok
+busco -m geno -c 2 -i spades_isolate/scaffolds.fasta --lineage bacteria
+busco -m geno -c 2 -i spades_isolate/scaffolds.fasta --lineage mycoplasmatales
 ```
 > The `-m` option selects the running mode (here `geno` for genome, other options are `trans` (transcriptome) or `prot`(protein)).
-> Since we know that we are dealing with a bacterium, we can constrain the automatic lineage selection to only search for prokaryotes (`--auto-lineage-prok`). 
 
 Have a look at the results, which are handily printed to the screen. 
 For this tutorial, we will only be looking at the proportion of complete BUSCOs (C).
-If all goes well, it should have identified the genome as bacterial (the generic domain), and as belonging to the mycoplasmatales.
 
 <details>
 <summary>Compare the results for the bacteria dataset with the results for the mycoplasmatales. Why could there be such a big difference?</summary>
@@ -413,8 +413,7 @@ _This is because most species in the Mycoplasmatales are specialized in the same
 _As a general rule, a BUSCO score >90% is considered good, >95% is considered very good._
 </details>
 
-Now try running BUSCO yourself on the two ABySS assemblies, but specifying that you only want to run it on the `mycoplasmatales_odb10` lineage. 
-You can run `busco -h` to print a help message on how to run BUSCO and use the different options.
+Now try running BUSCO yourself on the two ABySS assemblies, but only using the `mycoplasmatales` lineage. 
 
 <details>
 <summary>Are there large differences in BUSCO score between the assemblies?</summary>
