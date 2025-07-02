@@ -351,7 +351,7 @@ We can download the reference annotation in `gff` format using the following cod
 
 ```
 wget https://ftp.ncbi.nlm.nih.gov/refseq/MANE/MANE_human/release_1.4/MANE.GRCh38.v1.4.ensembl_genomic.gff.gz
-gunzip MANE.GRCh38.v1.3.refseq_genomic.gff.gz && mv MANE.GRCh38.v1.3.refseq_genomic.gff MANE.gff
+gunzip MANE.GRCh38.v1.4.ensembl_genomic.gff.gz && mv MANE.GRCh38.v1.4.ensembl_genomic.gff MANE.gff
 grep "chr15" MANE.gff > Chr15_MANE.gff
 sed -i 's/chr15/NC_000015.10/g' Chr15_MANE.gff
 ```
