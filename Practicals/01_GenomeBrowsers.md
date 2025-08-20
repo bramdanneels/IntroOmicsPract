@@ -33,7 +33,7 @@ _Involved in DNA repair, response to DNA damage, maintaining genome stability an
 <details>
 <summary>Where on the genome is BRCA1 located?</summary>
 
-_Chromosome 17, bp 43044295 - 43125402 (chr17:43,044,295-43,125,402)_
+_Chromosome 17, bp 43044295 - 43125364 (chr17:43,044,295-43,125,364) (Exact position might change depending on which transcript you selected)_
 </details>
 
 <details>
