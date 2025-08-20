@@ -27,7 +27,7 @@ Open the info panel for the BRCA1 gene by clicking on one of the transcripts. An
 <details>
 <summary>What is the function of the BRCA1 gene in humans?</summary>
 
-_Maintaining genome stability and tumor suppression._
+_Involved in DNA repair, response to DNA damage, maintaining genome stability and tumor suppression._
 </details>
 
 <details>
