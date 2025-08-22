@@ -180,7 +180,8 @@ In the "Regulation" category, activate the ORegAnno track. [ORegAnno](https://ww
 
 <details>
 <summary>Are there any proteins that bind to our supsected regulatory region? If so, which ones?</summary>
-_Yes:_
+
+  _Yes:_
 
 - _EGR1 (transcription factor)_
 - _CTCF (transcription factor)_
