@@ -143,7 +143,7 @@ multiqc --outdir longReadsQC/ longReadsQC/
 > Here we are using a bash for loop: for every file that ends in `fastq`, we will run fastqc on that file. 
 
 Download and have a look at the reports.
-> If you forgot how to download files from NREC, please see the [QC practical](02_QC.md).
+> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
 
 <details>
 <summary>In the long reads, the RNA_Nano reads are suprisingly short. Why could that be the case?</summary>
@@ -605,15 +605,8 @@ done
 
 This will create a `bam.bai` file for every bam file, containing the index (making it easier to search the file).
 Now we have to download both the `bam` files and their indexes to our local pc (if you're working on NREC or another remote server).
-You can do this using the following command (remember to replace the parts between curly brackets (`{}`) with your relevant details!)
-> Make sure your running this command from a temrinal on your own pc, not connected to the server.
-> The total size of the download is 1.75 Gb, if you don't have enough space on your disk, you can try downloading only a few files at a time.
-> You can replace `{target directory}` with `./` if you want to download the files to the folder from which you are running the command.
 
-```
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical4/*.bam' {target directory}
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical4/*.bam.bai' {target directory}
-```
+> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
 
 Once you have downloaded the files, you can launch IGV.
 Since _A. thaliana_ is a widely used model species, IGV has the TAIR genome included.
