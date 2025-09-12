@@ -114,6 +114,8 @@ Before assembling a genome, it is important to take a look at the data first.
 Activate the QC environment created in practical 2: `conda activate QC`.
 Then, run FastQC on all four files, download the files, and look at the reports.
 
+> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
+
 <details>
 <summary>How many reads are in this dataset, and how long are the reads?</summary>
 
@@ -283,6 +285,7 @@ quast -o assembly_QC -r ./reference.fasta spades_*/scaffolds.fasta Abyss_k*/*sca
 This will create a folder called "assembly_QC" containing the report on the statistics (`report.html`). 
 Download and go through the report and answer the questions below:
 > You can click "extend report" to get more statistics.
+> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
 
 <details>
 <summary>Which of the assemblies gave the largest contig?</summary>
