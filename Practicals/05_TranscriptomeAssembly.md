@@ -133,6 +133,8 @@ For an overview of the data used in this practical, please see the [information 
 As should be the habit by now, we will have a look at read QC first. 
 Run FastQC on the four files, and look at the reports.
 
+> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
+
 <details>
 <summary>How many reads are in each file?</summary>
 
@@ -536,18 +538,9 @@ grep "^NC_000015.10" HomSap.gtf > Chr15.gtf
 ```
 
 We need to download the necessary files: the reference data, the Stringtie annotations and the Trinity mappings.
-People on NREC can use the commands below to download the necessary files to their computer:
-> Remember to open a new terminal which is not connected to NREC, and to replace the parts between curly brackets (`{}`) with your relevant information.
-> You can replace `{target directory}` with `./` if you want to download the files to the folder from which you are running the command.
-> The total download size is +- 275 Mbp
+The relevant files are: `Chr15.fasta`, `Chr15.gtf`, all `.bam` and `.bai` files, and all stringtie `.gtf` files.
 
-```
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical5/Chr15.fasta' {target directory}
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical5/Chr15.gtf' {target directory}
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical5/TranscriptMap*.bam' {target directory}
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical5/TranscriptMap*.bam.bai' {target directory}
-scp -i {path to private key} '{username}@[{NREC_server_ip}]:/storage/{username}/Practical5/*stringtie.gtf {target directory}
-```
+> If you have problems downloading the files, you can find the relevant files on [Zenodo](https://zenodo.org/records/17119891).
 
 Now open IGV. Go to "Genomes" -> "Load genome from file", and load the `Chr15.fasta` file.
 Then, go to "File" -> "Load from file" and load the `Chr15.gtf`, and the 3 stringtie files (`gtf`s).
