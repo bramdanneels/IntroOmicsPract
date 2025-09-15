@@ -192,7 +192,9 @@ We have two short-read samples (Plant & Stool), and one long-read one (Sea).
 As usual, we'll start by performing quality control of our sequences.
 Since our read sets are a bit larger in size, FastQC would take a while to run on NREC.
 We have thus provided the FastQC reports with the data on NREC.
-Have a look at the QC reports.
+Download, and have a look at the QC reports.
+
+> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
 
 <details>
 <summary>Do we need any trimming?</summary>
@@ -266,6 +268,8 @@ ktImportText Sea.krona -o Sea.krona.html
 > `ktImportText` will transform the modified output to a krona plot.
 
 Now download and look at the generated `.html` files. 
+> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
+
 You will probably see that most of the plot is unclassified reads.
 This is because we are only classifying the reads using a 16S database. 
 16S is only one of the many genes in bacteria so if we sequence all the DNA from a sample, only few reads will be part of the 16S.
@@ -375,7 +379,8 @@ For your information, the commands used for running the assemblies can be found 
 The reason we provided the assembly graphs (`.gfa`) is because we want to take a look at them.
 A good tool to visualise the structure of our assembly graphs is [Bandage](http://rrwick.github.io/Bandage/). 
 Install the software, and then download the assembly graph from both assemblies (you might have to rename to avoid overwriting them when downloading).
-> Again, you can download the `.gfa` files directly from [Zenodo](https://zenodo.org/uploads/13120340) if you prefer. 
+> If you have problems downloading the files, you can find the relevant files on [Zenodo](https://zenodo.org/records/17120797).
+
 Start the Bandage software, and open the `.gfa` files of both assemblies. 
 Once opened, click on the “draw graph” button to draw the bandage graph.
 You can draw a frame over a collection of lines (contigs), and see their total length on the right side of the screen.
@@ -394,6 +399,7 @@ flye -t 2 --meta --pacbio-hifi Sea_HiFi.fastq -o Sea_metaFlye
 ```
 
 Download the assembly graph (`assembly_graph.gfa` in the `Sea_metaFlye` folder) and have a look at it.
+> If you have problems downloading the files, you can find the relevant files on [Zenodo](https://zenodo.org/records/17120797).
 
 <details>
 <summary>How is the assembly graph similar/different from the short-read assemblies?</summary>
@@ -492,6 +498,7 @@ cd ../Sea_bins && quast.py *fa
 
 Find and download the quast reports, and have a look at them.
 > You can use the `pwd` command to check in what directory you currently are
+> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
 
 <details>
 <summary>Given that most bacterial genomes are between 2 and 10 Mbp, how many full genomes do you think we recovered from every sample?</summary>
@@ -715,7 +722,8 @@ kreport2krona.py -r Soil_2.kraken.report -o Soil_2.krona && ktImportText Soil_2.
 kreport2krona.py -r Soil_3.kraken.report -o Soil_3.krona && ktImportText Soil_3.krona -o Soil_3.krona.html
 ```
 
-Now open the krona plots and have a look at the results.
+Now download and open the krona plots and have a look at the results.
+> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
 
 <details>
 <summary>Are the samples diverse, or are there only few dominating species?</summary>
