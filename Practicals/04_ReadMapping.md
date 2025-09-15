@@ -606,7 +606,7 @@ done
 This will create a `bam.bai` file for every bam file, containing the index (making it easier to search the file).
 Now we have to download both the `bam` files and their indexes to our local pc (if you're working on NREC or another remote server).
 
-> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
+> If you have problems downloading the files, you can find the relevant files on [Zenodo](https://zenodo.org/records/17119477).
 
 Once you have downloaded the files, you can launch IGV.
 Since _A. thaliana_ is a widely used model species, IGV has the TAIR genome included.
