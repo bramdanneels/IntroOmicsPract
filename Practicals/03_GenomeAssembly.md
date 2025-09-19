@@ -475,6 +475,8 @@ Run Quast on the 4 assemblies, and include the reference genome for this species
 Since we are working on another species than the long reads, we'll have to find another reference species.
 Try modifying the download command from the first part of the tutorial (where we downloaded the first reference genome) to download the _Mesomycoplasma ovipneumoniae_ reference genome.
 You can search for the accession number of the reference genome on [NCBI genomes](https://www.ncbi.nlm.nih.gov/genome/).
+Then, download and look at the QUAST report.
+> If you have problems downloading the files, you can find the relevant files in [this folder](../Outputs).
 
 <details>
 <summary>Based on assembly statistics alone, are these assemblies better or worse than the assemblies we have made using short reads? (the expected genomes size is +- 1 Mbp)</summary>
@@ -499,7 +501,7 @@ To check the completeness of the genome, run BUSCO on one assembly from the Nano
 <summary>Do the BUSCO scores indicate a good assembly?</summary>
 
 - _For the HiFi reads: yes (99.4% completeness for mycoplasmatales)_
-- _For the Nanopore reads: no (23-26% completeness for mollicutes)_
+- _For the Nanopore reads: no (18-26% completeness for mycoplasmatales)_
 
 _Thus, while both Nanopore and HiFi assemblies had very good assembly statistics, the Nanopore ones have very low BUSCO completeness score, while the HiFi showed very good BUSCO scores._
 _This is because the Nanopore reads used old Nanopore technology, that had error rates up to 15-20%. Assembling a genome using these reads alone leads to assemblies full of mitakes._
