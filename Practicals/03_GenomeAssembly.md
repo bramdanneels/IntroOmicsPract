@@ -231,7 +231,7 @@ _Assuming the total assembly length is the same, having more contigs is worse th
 <details>
 <summary>Are there differences between scaffolds and contigs in the assemblies?</summary>
 
-_Yes: In general there are fewer scaffolds than contigs (549 vs 570 in k31; 20 vs 49 in k75)._
+_Yes: In general there are fewer scaffolds than contigs (582 vs 570 in k31; 29 vs 49 in k75)._
 </details>
 
 <details>
