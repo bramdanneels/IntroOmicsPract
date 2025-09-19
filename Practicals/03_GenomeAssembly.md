@@ -290,20 +290,20 @@ Download and go through the report and answer the questions below:
 <details>
 <summary>Which of the assemblies gave the largest contig?</summary>
 
-_The SPAdes assemblies: 417 388bp (you can find this in "Largest contig" in the "Statistics without reference" section._
+_The ABYSS (k=75) assemblies: 521282 bp (you can find this in "Largest contig" in the "Statistics without reference" section._
 </details>
 
 <details>
 <summary>Which assembler had the most contigs? Which one the fewest?</summary>
 
-_The ABySS assembly using k31 has the most contigs (549), the ABySS assembly using k75 has the fewest contigs (20)._
+_The ABySS assembly using k31 has the most contigs (482), the megahit assembly (final.contigs) has the fewest contigs (22)._
 _You can find this under "# contigs (>= 0bp)" in the "Statistics without reference" section._
 </details>
 
 <details>
 <summary>Which assembly has the best N50? Is this the highest or the lowest value?</summary>
 
-_The SPAdes assemblies have the best N50: 417 388._
+_The Abyss (k=75) assembly have the best N50: 521282._
 _This is the highest value, as a higher N50 is better._ 
 _This is because a higher N50 means that the largest contigs (making up at least 50% of the assembly) are larger compared to assemblies with lower N50._
 _The N50 value can be found in the "Statistics without reference" section._
@@ -345,13 +345,13 @@ _Thus, NG50 is a better metric to assess an assembly, but it requires you to hav
 <details>
 <summary>Which assembly covers the largest fraction of the reference genome?</summary>
 
-_The Abyss_k75 assembly (99.289%). You can find this in the "Genome fraction" row under the "Genome statistics section"._
+_The SPAdes (isolate) assembly: (98.988%). You can find this in the "Genome fraction" row under the "Genome statistics section"._
 </details>
 
 <details>
 <summary>Which assembly shows the most/fewest mismatches and indels compared to the reference?</summary>
 
-_The Abyss k75 assembly has the most mismatches and indels, the Abyss k31 the fewest._
+_The SPAdes (isolate) assembly has the most mismatches and indels, the Abyss k31 the fewest._
 </details>
 
 <details>
@@ -365,9 +365,8 @@ _The observed mismatches and indels are thus likely differences that evolved bet
 <details>
 <summary>Which of the genome assemblies do you think is best, and why?</summary>
 
-_Either one of the SPAdes assemblies, or the ABySS k75. The SPAdes assemblies have a higher NG50 and have a larger largest contig._ 
-_However, ABySS k75 captures a higher fraction of the reference genome, and has fewer contigs in total._
-_Personally, I would pick the SPAdes assembly, but filter out the smaller contigs (< 1000bp)._
+_Either one of the SPAdes assemblies, or the ABySS k75. The ABySS k75 assembly has a higher NG50, fewer total contigs, and the largest largest contig._ 
+_However, SPAdes (isolate) captures a slightly higher fraction of the reference genome._
 </details>
 
 ## BUSCO analysis
