@@ -240,7 +240,7 @@ for map in *bam; do \
 echo $map;
 echo "Average coverage:" && samtools depth -a $map | awk '{c++;s+=$3}END{print s/c}';
 echo "% of genome covered:" && samtools depth -a $map | awk '{c++; if ($3>0) total+=1}END{print (total/c)*100}';
-echo "% reads mapped:" && samtools flagstat $map | grep "mapped (";
+echo "Number of reads mapped:" && samtools view -c -F 260 $map;
 echo ""
 done
 ```
@@ -252,23 +252,23 @@ done
 > and each time we have a base which has a coverage (stored in the 3rd column) higher than zero, we will add 1 to the total (`if ($3>0) total+=1`). 
 > In the end we will calculate how much of the genome is covered by dividing the number of bases with coverage > 0 (`total`) by the total number of bases (`c`): `print (total/c)*100`. 
 > We multiply by 100 to get the result in percentage instead of proportion.
-> In the third command we just create a summary file with some mapping stats, and look for the line that says "mapped".
-> If you want to know more about what these commands do exactly, you can have a look [here](https://sarahpenir.github.io/bioinformatics/awk/calculating-mapping-stats-from-a-bam-file-using-samtools-and-awk/).
+> In the third command we count all reads in the bam (`-c`), but exclude (`-F 260`) unmapped & secondary alignments.
+> If you want to know more about what these commands do exactly, you can have a look [here](https://sarahpenir.github.io/bioinformatics/awk/calculating-mapping-stats-from-a-bam-file-using-samtools-and-awk/) and [here](https://www.metagenomics.wiki/tools/samtools/number-of-reads-in-bam-file).
 
 <details>
 <summary>Are there any large differences between the mapping statistics of the different mappers?</summary>
 
-_Not really. BWA-mem has slightly lower coverage and a smaller fraction of the genome covered, and it mapped fewer reads than the other two mappers._
-_However, the differences are very minor._
+_Not really. HiSat has slightly lower coverage and a smaller fraction of the genome covered, and it mapped fewer reads than the other two mappers._
+_However, the differences are relatively small._
 </details>
 
 <details>
-<summary>Given that we have sequences from the whole genome, why is only +- 60% of the genome covered?</summary>
+<summary>Given that we have sequences from the whole genome, why is only 55-60% of the genome covered?</summary>
 
 _We only used a subset of a normal sequencing run (1M reads in the case of short reads)._
 _Since we have two read files (forward & reverse), we have 2 million reads of 100bp each (= 200M bases in total)._
 _Given that the A. thaliana genome is +- 136 Mbp large, an average coverage of 1.45 makes sense._
-_Since not all regions are equally likely to be sequenced, it is normal to miss large parts of the genome, leading to the low observed covered fraction._
+_However, since reads generally map randomly to the genome (if doing whole-genome sequencing), it is likely that a large part of reads will map to overlapping regions of the genome while others part of the genome will have no mapped reads._
 </details>
 >Note: Here we have used the mappers using the default settings. All three mappers can be finetuned to improve mapping performance depending on the situation.
 
@@ -288,13 +288,13 @@ smalt map -n 2 TAIR_smalt.index Atha_ChIP_PE_F.fastq.filt Atha_ChIP_PE_R.fastq.f
 Again, we will calculate the mapping statistics:
 
 ```
-samtools depth -a CHIP_smalt.bam | awk '{c++;s+=$3}END{print s/c}'
-samtools depth -a CHIP_smalt.bam | awk '{c++; if ($3>0) total+=1}END{print (total/c)*100}'
-samtools flagstat CHIP_smalt.bam | grep "mapped ("
+echo "Average coverage:" && samtools depth -a CHIP_smalt.bam | awk '{c++;s+=$3}END{print s/c}'
+echo "% of genome covered:" && samtools depth -a CHIP_smalt.bam | awk '{c++; if ($3>0) total+=1}END{print (total/c)*100}'
+echo "Number of mapped reads:" && samtools view -c -F 260 CHIP_smalt.bam
 ```
 
-We see that an even smaller fraction of the genome is covered (46%).
-This is of course because ChIP-seq has a selection step where we only select parts of the genome to be sequenced (e.g. where a certain transcription factor binds).
+We see that an even smaller fraction of the genome is covered (+- 46%) and we have a lower average coverage (+- 0.79), despite having the same amount of reads.
+This is because ChIP-seq has a selection step where we only select parts of the genome to be sequenced (e.g. where a certain transcription factor binds).
 Thus, most reads will be derived from these regions, and less reads will map to the other regions, lowering the overal covered fraction of the genome.
  
 ## Long Read Mapping
@@ -320,15 +320,16 @@ for map in DNA_HiFi.bam DNA_Nano.bam; do \
 echo $map;
 echo "Average coverage:" && samtools depth -a $map | awk '{c++;s+=$3}END{print s/c}';
 echo "% of genome covered:" && samtools depth -a $map | awk '{c++; if ($3>0) total+=1}END{print (total/c)*100}';
-echo "% reads mapped:" && samtools flagstat $map | grep "mapped (";
+echo "Number of mapped reads:" && samtools view -c -F 260 $map;
 echo ""
 done
 ```
 
 <details>
-<summary>Despite having a lot fewer reads (10 thousand instead of 1 million), we have similar mapping statistics for the HiFi reads as the short read mappings. Why?</summary>
+<summary>Despite having a lot fewer reads (10 thousand instead of 1 million), we have similar mapping statistics (coverage and genome fraction) for the HiFi reads as the short read mappings. Why?</summary>
 
 _Because the reads are longer. As such, we need a lot fewer reads to have the same amount of bases to cover a certain proportion of the genome._
+_In other words, you need fewer reads to get the same amount of total bases with longer reads._
 </details>
 
 <details>
@@ -397,7 +398,7 @@ for map in RNA_PE_hisat.bam RNA_PE_hisat_splice.bam; do \
 echo $map;
 echo "Average coverage:" && samtools depth -a $map | awk '{c++;s+=$3}END{print s/c}';
 echo "% of genome covered:" && samtools depth -a $map | awk '{c++; if ($3>0) total+=1}END{print (total/c)*100}';
-echo "% reads mapped:" && samtools flagstat $map | grep "mapped (";
+echo "Number of mapped reads:" && samtools view -c -F 260 $map;
 echo ""
 done
 ```
@@ -405,10 +406,10 @@ done
 <details>
 <summary>Are there big differences in mapping statistics?</summary>
 
-_Not really. The mapping with splicing information had slightly better statistics, but the difference is very small._
+_Not really. The mapping statistics are highly similar._
 
 _Also note the low proportion of the genome covered. This is of course since we are only mapping reads to exons, which are only a minor part of the genome._
-_Most eukaryotic genomes mainly consist of repeated sequences which will not be covered by RNA-seq data._
+_Most eukaryotic genomes mainly consist of non-coding sequences which will not be covered by RNA-seq data (as only coding transcripts (= mRNA) is sequenced)._
 </details>
 
 STAR is a very popular RNA-seq mapper. Let's try using it as well.
@@ -445,15 +446,15 @@ Then, let’s assess the mapping statistics:
 
 ```
 map=RNA_PE_STAR.bam
-echo "Average coverage:" && samtools depth -a $map | awk '{c++;s+=$3}END{print s/c}';
-echo "% of genome covered:" && samtools depth -a $map | awk '{c++; if ($3>0) total+=1}END{print (total/c)*100}';
-echo "% reads mapped:" && samtools flagstat $map | grep "mapped (";
+echo "Average coverage:" && samtools depth -a $map | awk '{c++;s+=$3}END{print s/c}'
+echo "% of genome covered:" && samtools depth -a $map | awk '{c++; if ($3>0) total+=1}END{print (total/c)*100}'
+echo "Number of mapped reads:" && samtools view -c -F 260 $map
 ```
 
 <details>
 <summary>How does STAR compare to HiSat2 in terms of mapping statistics?</summary>
 
-_It has slightly better statistics: higher coverage, more of the genome covered, and all reads could be mapped._
+_It has slightly better statistics: higher coverage, more of the genome covered, and a bit more reads could be mapped._
 </details>
 
 Lastly, we will use Minimap2 to map the long RNA reads we have. Again we need to calculate splice junctions to be able to do the spliced-aware mapping.
@@ -473,14 +474,15 @@ Now let's calculate the statistics:
 map=RNA_NanoPore.bam
 echo "Average coverage:" && samtools depth -a $map | awk '{c++;s+=$3}END{print s/c}'
 echo "% of genome covered:" && samtools depth -a $map | awk '{c++; if ($3>0) total+=1}END{print (total/c)*100}'
-echo "% reads mapped:" && samtools flagstat $map | grep "mapped ("
+echo "Number of mapped reads:" && samtools view -c -F 260 $map"
 ```
 
 <details>
 <summary>How are the mapping results compared to the short reads?</summary>
 
-_Not so good. All statistics are lower. This is because the Nanopore reads have a lot of errors, leading to difficulties aligning all reads._ 
+_Not so good. All statistics are significantly lower. This is because the Nanopore reads have a lot of errors, leading to difficulties aligning all reads._ 
 _Additionally, we have fewer total bases in the Nanopore set than in the short read set (83.5M bp vs 200 Mbp; before filtering), leading to lower coverage._
+_Lastly, the experimental setup could also have played a role. Depending on the condition in which RNA was extract, a different number of genes could be expressed, which can lead to reads mapping to fewer regions of the genome._
 </details>
 
 ## Using the wrong tool
@@ -500,7 +502,7 @@ rm -r Aligned.out.sam Log.* SJ.out.tab _STARgenome
 map=DNA_PE_STAR.bam
 echo "Average coverage:" && samtools depth -a $map | awk '{c++;s+=$3}END{print s/c}'
 echo "% of genome covered:" && samtools depth -a $map | awk '{c++; if ($3>0) total+=1}END{print (total/c)*100}'
-echo "% reads mapped:" && samtools flagstat $map | grep "mapped ("
+echo "Number of mapped reads:" && samtools view -c -F 260 $map"
 ```
 > Note: this mapping can take a bit of time (15-20 minutes, likely more on a busy server).
 
@@ -550,7 +552,7 @@ Let's try the opposite: mapping short reads with a long-read mapper (Minimap2). 
 > Minimap2 can actually map short reads, but here we will use the long-read mapping mode instead.
 
 ```
-minimap2 -t 2 -ax map-ont TAIR.fasta Atha_DNA_SE.fastq.filt | samtools view -bS | samtools sort > DNA_SE_minimapLR.bam
+minimap2 -t 2 -ax map-pb TAIR.fasta Atha_DNA_SE.fastq.filt | samtools view -bS | samtools sort > DNA_SE_minimapLR.bam
 ```
 
 Since we haven't mapped the SE reads yet, we'll have to do that to be able to compare the statistics.
@@ -567,7 +569,7 @@ for map in DNA_SE_minimap*; do \
 echo $map;
 echo "Average coverage:" && samtools depth -a $map | awk '{c++;s+=$3}END{print s/c}';
 echo "% of genome covered:" && samtools depth -a $map | awk '{c++; if ($3>0) total+=1}END{print (total/c)*100}';
-echo "% reads mapped:" && samtools flagstat $map | grep "mapped (";
+echo "Number of mapped reads:" && samtools view -c -F 206 $map;
 echo "";
 done
 ```
@@ -575,7 +577,7 @@ done
 <details>
 <summary>How do the mappings compare in terms of statistics?</summary>
 
-_Mapping using the short read option has better statistics: higher coverage, more of the genome covered, and more mapped reads._
+_Mapping using the short read option has better statistics: higher coverage, more of the genome covered, and more reads mapped._
 </details>
 
 Lastly, we'll have a quick look on what happens if we map reads from a different species. 
